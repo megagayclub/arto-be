@@ -7,6 +7,13 @@ on:
 permissions:
   contents: read
 
+# 환경설정
+env:
+  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/arto-fe-deploy
+  VERSION: ${{ github.sha }}
+  NAME: go_cicd
+
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
