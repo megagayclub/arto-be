@@ -16,12 +16,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+      # 2. ✅ 실행 권한 부여 단계 (필수): 파일이 루트에 있다고 가정
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
     # 1. Java 17 세팅
     - name: Set up JDK 17
       uses: actions/setup-java@v3
       with:
         java-version: '17'
         distribution: 'temurin'
+
 
     # 2. Spring Boot 애플리케이션 빌드
     - name: Build with Gradle
