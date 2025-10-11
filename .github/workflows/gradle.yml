@@ -50,16 +50,9 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GHCR_TOKEN }}
 
-      # 📦 2. Docker Build 및 Push (쉘 스크립트 사용)
-      - name: Docker Build & Push
+      - name: Docker build & push
         run: |
-          # 1. Docker 이미지 빌드
-          # env.DOCKER_IMAGE는 'ghcr.io/user/repo' 주소여야 합니다.
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker build -t ${{ env.DOCKER_IMAGE }}:latest .
-          
-          # 2. GHCR에 이미지 푸시
           docker push ${{ env.DOCKER_IMAGE }}:latest
-          
-          # 3. 로컬 이미지 정리
-          # sudo 명령어 대신 docker 명령 자체로 정리 (runner 권한에 따라 sudo가 필요할 수도 있음)
-          docker image prune -f 
+            sudo docker image prune -f
