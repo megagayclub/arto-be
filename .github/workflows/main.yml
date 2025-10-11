@@ -19,6 +19,8 @@ jobs:
     steps:
       # github repository에서 checkout
       - uses: actions/checkout@v3
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       # docker build 수행
       - name: Set up docker buildx
         id: buildx
