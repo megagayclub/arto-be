@@ -9,7 +9,7 @@ permissions:
 
 # 환경설정
 env:
-  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/arto-fe-deploy
+  DOCKER_IMAGE: ghcr.io/${{ github.actor }}/arto-be-deploy
   VERSION: ${{ github.sha }}
   NAME: go_cicd
 
