@@ -43,4 +43,3 @@ jobs:
           docker build -t ${{ secrets.DOCKER_REPO }}:latest .
           docker push ${{ secrets.DOCKER_REPO }}:latest
             sudo docker image prune -f
-출처: https://hhongyeahh.tistory.com/117 [hhongyeahh:티스토리]
