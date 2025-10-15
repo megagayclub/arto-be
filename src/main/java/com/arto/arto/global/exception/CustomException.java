@@ -11,4 +11,3 @@ public class CustomException extends RuntimeException{
     private String message;
 
 }
-
