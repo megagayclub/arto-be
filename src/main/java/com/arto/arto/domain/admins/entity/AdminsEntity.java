@@ -19,6 +19,7 @@ public class AdminsEntity {
     @Column(name = "admin_id")
     private Long adminId;
 
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UsersEntity user;
