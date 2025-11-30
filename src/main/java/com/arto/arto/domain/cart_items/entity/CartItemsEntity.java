@@ -7,6 +7,7 @@ import lombok.*;
 
 @Entity
 @Table(
+        
         name = "tbl_cart_items",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_cart_artwork", columnNames = {"cart_id", "artwork_id"})
