@@ -1,6 +1,6 @@
 package com.arto.arto.domain.users.controller;
 
-import com.arto.arto.domain.users.dto.SignUpRequestDto;
+import com.arto.arto.domain.users.dto.request.SignUpRequestDto;
 import com.arto.arto.domain.users.service.UsersService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
