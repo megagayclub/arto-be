@@ -18,11 +18,11 @@ public class ArtworkSimpleResponse {
 
     public static ArtworkSimpleResponse fromEntity(ArtworkEntity entity) {
         return ArtworkSimpleResponse.builder()
-//                .artworkId(entity.getArtworkId())
-//                .title(entity.getTitle())
-//                .artistName(entity.getArtistName())
-//                .price(entity.getPrice())
-//                .thumbnailImageUrl(entity.getThumbnailImageUrl())
+                .artworkId(entity.getId())
+                .title(entity.getTitle())
+                .artistName(entity.getArtistName())
+                .price(entity.getPrice())
+                .thumbnailImageUrl(entity.getThumbnailImageUrl())
                 .build();
     }
 }

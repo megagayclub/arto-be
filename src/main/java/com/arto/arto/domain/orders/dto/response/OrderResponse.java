@@ -29,20 +29,20 @@ public class OrderResponse {
 
     public static OrderResponse fromEntity(OrdersEntity order) {
         return OrderResponse.builder()
-//                .orderId(order.getId())
-//                .buyerId(order.getBuyer().getUserId())
-//                .buyerName(order.getBuyer().getName())
+                .orderId(order.getId())
+                .buyerId(order.getBuyer().getUserId())
+                .buyerName(order.getBuyer().getName())
 //                .artworkId(order.getArtwork().getArtworkId())
-//                .artworkTitle(order.getArtwork().getTitle())
-//                .orderDate(order.getOrderDate().toString())
-//                .totalAmount(order.getTotalAmount())
-//                .orderStatus(order.getOrderStatus())
-//                .postCode(order.getPostCode())
-//                .shippingAddress(order.getShippingAddress())
-//                .shippingPhoneNumber(order.getShippingPhoneNumber())
-//                .receiverName(order.getReceiverName())
-//                .deliveryStartDate(order.getDeliveryStartDate() != null ? order.getDeliveryStartDate().toString() : null)
-//                .deliveryCompletedDate(order.getDeliver() != null ? order.getDeliver().toString() : null)
+                .artworkTitle(order.getArtwork().getTitle())
+                .orderDate(order.getOrderDate().toString())
+                .totalAmount(order.getTotalAmount())
+                .orderStatus(order.getOrderStatus())
+                .postCode(order.getPostCode())
+                .shippingAddress(order.getShippingAddress())
+                .shippingPhoneNumber(order.getShippingPhoneNumber())
+                .receiverName(order.getReceiverName())
+                .deliveryStartDate(order.getDeliveryStartDate() != null ? order.getDeliveryStartDate().toString() : null)
+                .deliveryCompletedDate(order.getDeliver() != null ? order.getDeliver().toString() : null)
                 .build();
     }
 }

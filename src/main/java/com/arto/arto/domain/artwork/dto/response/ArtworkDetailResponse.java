@@ -19,7 +19,6 @@ public class ArtworkDetailResponse {
     private String dimensions;
     private BigDecimal price;
     private String status;
-    private String space;
     private String frameType;
     private String shippingMethod;
     private BigDecimal shippingCost;
@@ -29,22 +28,21 @@ public class ArtworkDetailResponse {
 
     public static ArtworkDetailResponse fromEntity(ArtworkEntity entity) {
         return ArtworkDetailResponse.builder()
-//                .artworkId(entity.getArtworkId())
-//                .title(entity.getTitle())
-//                .artistName(entity.getArtistName())
-//                .shortDescription(entity.getShortDescription())
-//                .description(entity.getDescription())
-//                .creationYear(entity.getCreationYear())
-//                .dimensions(entity.getDimensions())
-//                .price(entity.getPrice())
-//                .status(entity.getStatus().name())
-//                .space(entity.getSpace())
-//                .frameType(entity.getFrameType())
-//                .shippingMethod(entity.getShippingMethod())
-//                .shippingCost(entity.getShippingCost())
-//                .thumbnailImageUrl(entity.getThumbnailImageUrl())
-//                .viewCount(entity.getViewCount())
-//                .inquiryCount(entity.getInquiryCount())
+                .artworkId(entity.getId())
+                .title(entity.getTitle())
+                .artistName(entity.getArtistName())
+                .shortDescription(entity.getShortDescription())
+                .description(entity.getDescription())
+                .creationYear(entity.getCreationYear())
+                .dimensions(entity.getDimensions())
+                .price(entity.getPrice())
+                .status(entity.getStatus().name())
+                .frameType(entity.getFrameType())
+                .shippingMethod(entity.getShippingMethod())
+                .shippingCost(entity.getShippingCost())
+                .thumbnailImageUrl(entity.getThumbnailImageUrl())
+                .viewCount(entity.getViewCount())
+                .inquiryCount(entity.getInquiryCount())
                 .build();
     }
 }

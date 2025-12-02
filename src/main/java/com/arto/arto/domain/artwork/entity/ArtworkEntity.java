@@ -2,11 +2,14 @@ package com.arto.arto.domain.artwork.entity;
 
 import com.arto.arto.domain.artwork.type.ArtworkStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Getter
 @Entity
 @Table(name = "artworks")
 public class ArtworkEntity {
