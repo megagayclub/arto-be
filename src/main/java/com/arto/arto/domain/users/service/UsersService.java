@@ -1,6 +1,7 @@
 package com.arto.arto.domain.users.service;
 
 import com.arto.arto.domain.users.dto.request.SignUpRequestDto;
+import com.arto.arto.domain.users.dto.response.UserResponseDto;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import com.arto.arto.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +17,7 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
 
-    /**
-     * 회원가입 로직
-     */
+    //회원가입
     @Transactional
     public Long signUp(SignUpRequestDto requestDto) {
         // 1. 이메일 중복 검사
@@ -42,9 +41,7 @@ public class UsersService {
     private final JwtTokenProvider jwtTokenProvider; // 1. 아까 만든 토큰 기계 주입
     // (※ 필드에 private final JwtTokenProvider jwtTokenProvider; 추가하고, 생성자 주입 확인하세요!)
 
-    /**
-     * 로그인 로직
-     */
+    //로그인
     @Transactional(readOnly = true) // 조회만 하니까 readOnly = true (성능 향상)
     public String login(String email, String password) {
 
@@ -57,7 +54,16 @@ public class UsersService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        // 3. 인증 성공! 토큰 생성해서 반환
+        // 3. 인증 성공, 토큰 생성해서 반환
         return jwtTokenProvider.createToken(user.getEmail());
+    }
+
+    //내 정보 조회
+    @Transactional(readOnly = true)
+    public UserResponseDto getMyInfo(String email) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+
+        return UserResponseDto.from(user);
     }
 }
