@@ -7,12 +7,16 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 
 @Component
@@ -29,12 +33,13 @@ public class JwtTokenProvider {
     }
 
     // 1. 토큰 생성
-    public String createToken(String email) {
+    public String createToken(String email, String role) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + tokenValidityInMilliseconds);
 
         return Jwts.builder()
                 .setSubject(email)
+                .claim("role", role) // ✨ 여기에 역할 정보 저장!
                 .setIssuedAt(now)
                 .setExpiration(validity)
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -49,9 +54,17 @@ public class JwtTokenProvider {
                 .parseClaimsJws(token)
                 .getBody();
 
-        // 권한 정보는 일단 비워둡니다 (new ArrayList<>())
-        UserDetails principal = new User(claims.getSubject(), "", new ArrayList<>());
-        return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
+        // 토큰에서 role 꺼내기 (없으면 기본 USER)
+        String role = claims.get("role", String.class);
+        if (role == null) role = "USER";
+
+        // "ROLE_" 접두사 붙이기 (Spring Security 규칙)
+        // 예: ADMIN -> ROLE_ADMIN
+        Collection<? extends GrantedAuthority> authorities =
+                Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+
+        UserDetails principal = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
     }
 
     // 3. 토큰 유효성 검증 (필터에서 사용)

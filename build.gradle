@@ -62,6 +62,10 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'	//스프링 시큐리티를 테스트하기위한 의존성
 }
 
+tasks.withType(JavaCompile) {
+	options.compilerArgs.add("-parameters")
+}
+
 tasks.named('test') {
 	useJUnitPlatform()
 }

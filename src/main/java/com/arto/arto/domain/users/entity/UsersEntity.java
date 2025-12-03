@@ -2,18 +2,17 @@ package com.arto.arto.domain.users.entity;
 
 import com.arto.arto.domain.users.type.Role;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @Table(name = "tbl_users")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class UsersEntity {
 
     @Id
