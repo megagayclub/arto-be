@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class PasswordChangeRequestDto {
-    @NotBlank(message = "현재 비밀번호를 입력해주세요.")
+    @NotBlank(message = "現在のパスワードを入力してください。")
     private String currentPassword;
 
-    @NotBlank(message = "새로운 비밀번호를 입력해주세요.")
+    @NotBlank(message = "新しいパスワードを入力してください。")
     private String newPassword;
 }

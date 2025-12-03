@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserUpdateRequestDto {
-    @NotBlank(message = "이름은 필수입니다.")
+    @NotBlank(message = "名前は必須項目です。")
     private String name;
 
     private String phoneNumber;

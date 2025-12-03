@@ -31,7 +31,7 @@ public class UsersController {
     public ResponseEntity<Map<String, Object>> signUp(@RequestBody @Valid SignUpRequestDto requestDto) {
         Long userId = usersService.signUp(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                "message", "회원가입이 완료되었습니다.",
+                "message", "会員登録が完了しました。",
                 "userId", userId
         ));
     }
@@ -64,7 +64,7 @@ public class UsersController {
 
         usersService.updateMyInfo(userDetails.getUsername(), requestDto);
 
-        return ResponseEntity.ok(Map.of("message", "정보가 수정되었습니다."));
+        return ResponseEntity.ok(Map.of("message", "情報が更新されました。"));
     }
 
     //비밀번호 변경 API[PUT] /api/v1/me/password
@@ -75,7 +75,7 @@ public class UsersController {
 
         usersService.changePassword(userDetails.getUsername(), requestDto);
 
-        return ResponseEntity.ok(Map.of("message", "비밀번호가 변경되었습니다."));
+        return ResponseEntity.ok(Map.of("message", "パスワードが変更されました。"));
     }
 
     //회원 탈퇴 API[DELETE] /api/v1/me

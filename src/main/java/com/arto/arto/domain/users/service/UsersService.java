@@ -25,7 +25,7 @@ public class UsersService {
         // 1. 이메일 중복 검사
         if (usersRepository.existsByEmail(requestDto.getEmail())) {
             // TODO: 나중에 우리가 설계한 커스텀 예외(EmailDuplicateException)로 바꿔야 합니다.
-            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+            throw new IllegalArgumentException("既に使用されているメールアドレスです。");
         }
 
         // 2. 비밀번호 암호화
@@ -49,11 +49,11 @@ public class UsersService {
 
         // 1. 이메일로 회원 찾기 (없으면 에러)
         UsersEntity user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("登録されていないメールアドレスです。"));
 
         // 2. 비밀번호 검증 (입력받은 비번 vs DB의 암호화된 비번 비교)
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("パスワードが一致しません。");
         }
 
         // 3. 인증 성공, 토큰 생성해서 반환
@@ -64,7 +64,7 @@ public class UsersService {
     @Transactional(readOnly = true)
     public UserResponseDto getMyInfo(String email) {
         UsersEntity user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("ユーザー情報が見つかりません。"));
 
         return UserResponseDto.from(user);
     }
@@ -73,7 +73,7 @@ public class UsersService {
     @Transactional
     public void updateMyInfo(String email, UserUpdateRequestDto requestDto) {
         UsersEntity user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("ユーザー情報が見つかりません。"));
 
         // Entity의 Setter를 사용해 정보 수정 (Dirty Checking으로 자동 저장됨)
         user.setName(requestDto.getName());
@@ -85,11 +85,11 @@ public class UsersService {
     @Transactional
     public void changePassword(String email, PasswordChangeRequestDto requestDto) {
         UsersEntity user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("ユーザー情報が見つかりません。"));
 
         // 현재 비밀번호 확인
         if (!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("現在のパスワードが一致しません。");
         }
 
         // 새 비밀번호 암호화 후 저장
@@ -100,7 +100,7 @@ public class UsersService {
     @Transactional
     public void withdraw(String email) {
         UsersEntity user = usersRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません。"));
 
         // 계정 비활성화 (is_active = false)
         user.setActive(false);
