@@ -3,8 +3,11 @@ package com.arto.arto.domain.orders.entity;
 import com.arto.arto.domain.artwork.entity.ArtworkEntity;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+
 import java.time.LocalDate;
 
+@Getter
 @Entity
 @Table(name = "tbl_orders")
 public class OrdersEntity {
