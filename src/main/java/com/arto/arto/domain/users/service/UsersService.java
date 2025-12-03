@@ -2,6 +2,8 @@ package com.arto.arto.domain.users.service;
 
 import com.arto.arto.domain.users.dto.request.SignUpRequestDto;
 import com.arto.arto.domain.users.dto.response.UserResponseDto;
+import com.arto.arto.domain.users.dto.request.PasswordChangeRequestDto;
+import com.arto.arto.domain.users.dto.request.UserUpdateRequestDto;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import com.arto.arto.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -65,5 +67,42 @@ public class UsersService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
 
         return UserResponseDto.from(user);
+    }
+
+    //내 정보 수정
+    @Transactional
+    public void updateMyInfo(String email, UserUpdateRequestDto requestDto) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // Entity의 Setter를 사용해 정보 수정 (Dirty Checking으로 자동 저장됨)
+        user.setName(requestDto.getName());
+        user.setPhoneNumber(requestDto.getPhoneNumber());
+        user.setAddress(requestDto.getAddress());
+    }
+
+    //비밀번호 변경
+    @Transactional
+    public void changePassword(String email, PasswordChangeRequestDto requestDto) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 현재 비밀번호 확인
+        if (!passwordEncoder.matches(requestDto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 새 비밀번호 암호화 후 저장
+        user.setPassword(passwordEncoder.encode(requestDto.getNewPassword()));
+    }
+
+    //회원 탈퇴(논리적 삭제)
+    @Transactional
+    public void withdraw(String email) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        // 계정 비활성화 (is_active = false)
+        user.setActive(false);
     }
 }
