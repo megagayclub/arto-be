@@ -44,7 +44,7 @@ public class QOrdersEntity extends EntityPathBase<OrdersEntity> {
 
     public final StringPath shippingPhoneNumber = createString("shippingPhoneNumber");
 
-    public final NumberPath<Integer> totalAmount = createNumber("totalAmount", Integer.class);
+    public final NumberPath<java.math.BigDecimal> totalAmount = createNumber("totalAmount", java.math.BigDecimal.class);
 
     public QOrdersEntity(String variable) {
         this(OrdersEntity.class, forVariable(variable), INITS);

@@ -4,10 +4,13 @@ import com.arto.arto.domain.artwork.entity.ArtworkEntity;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "tbl_orders")
 public class OrdersEntity {
@@ -28,7 +31,7 @@ public class OrdersEntity {
     private LocalDate orderDate;
 
     @Column(name = "total_amount", nullable = false)
-    private Integer totalAmount;
+    private BigDecimal totalAmount;
 
     @Column(name = "order_status", nullable = false)
     private String orderStatus;

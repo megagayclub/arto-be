@@ -4,6 +4,8 @@ import com.arto.arto.domain.orders.entity.OrdersEntity;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Builder
 public class OrderResponse {
@@ -16,7 +18,7 @@ public class OrderResponse {
     private String artworkTitle;
 
     private String orderDate;
-    private Integer totalAmount;
+    private BigDecimal totalAmount;
     private String orderStatus;
 
     private Integer postCode;
@@ -32,7 +34,7 @@ public class OrderResponse {
                 .orderId(order.getId())
                 .buyerId(order.getBuyer().getUserId())
                 .buyerName(order.getBuyer().getName())
-//                .artworkId(order.getArtwork().getArtworkId())
+                .artworkId(order.getArtwork().getId())
                 .artworkTitle(order.getArtwork().getTitle())
                 .orderDate(order.getOrderDate().toString())
                 .totalAmount(order.getTotalAmount())
