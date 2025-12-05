@@ -10,7 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
+import com.arto.arto.domain.artwork.dto.request.ArtworkSearchCondition;
+import com.arto.arto.domain.artwork.dto.response.ArtworkSimpleResponseDto;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -40,6 +43,15 @@ public class ArtworkController {
     public ResponseEntity<ArtworkDetailResponseDto> getArtworkDetail(@PathVariable("artworkId") Long artworkId) {
 
         ArtworkDetailResponseDto response = artworkService.getArtworkDetail(artworkId);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ArtworkSimpleResponseDto>> getArtworkList(
+            @ModelAttribute ArtworkSearchCondition condition) {
+
+        List<ArtworkSimpleResponseDto> response = artworkService.getArtworkList(condition);
 
         return ResponseEntity.ok(response);
     }

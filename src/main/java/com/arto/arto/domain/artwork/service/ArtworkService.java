@@ -10,6 +10,9 @@ import com.arto.arto.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.arto.arto.domain.artwork.dto.request.ArtworkSearchCondition;
+import com.arto.arto.domain.artwork.dto.response.ArtworkSimpleResponseDto;
+import java.util.stream.Collectors;
 
 import java.util.HashSet;
 import java.util.List;
@@ -69,4 +72,17 @@ public class ArtworkService {
 
         return ArtworkDetailResponseDto.fromEntity(artwork);
     }
+
+    @Transactional(readOnly = true)
+    public List<ArtworkSimpleResponseDto> getArtworkList(ArtworkSearchCondition condition) {
+        // 1. QueryDSL로 조건에 맞는 작품들 찾아오기
+        List<ArtworkEntity> artworks = artworkRepository.search(condition);
+
+        // 2. Entity 리스트를 -> DTO 리스트로 변환 (요약 정보만)
+        return artworks.stream()
+                .map(ArtworkSimpleResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+
 }
