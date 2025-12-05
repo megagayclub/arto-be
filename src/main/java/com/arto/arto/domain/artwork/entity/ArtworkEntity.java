@@ -16,6 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -102,4 +103,16 @@ public class ArtworkEntity {
     )
     @Builder.Default
     private Set<MoodEntity> moods = new HashSet<>();
+
+    public void setColors(List<ColorEntity> colors) {
+        this.colors = new HashSet<>(colors);
+    }
+
+    public void setSpaces(List<SpaceEntity> spaces) {
+        this.spaces = new HashSet<>(spaces);
+    }
+
+    public void setMoods(List<MoodEntity> moods) {
+        this.moods = new HashSet<>(moods);
+    }
 }

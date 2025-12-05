@@ -48,13 +48,13 @@ public class SecurityConfig {
                 // URL 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         // 1. 누구나 접속 가능 (회원가입, 로그인, 스웨거)
-                        .requestMatchers("/api/v1/users", "/api/v1/login").permitAll()
+                        .requestMatchers("/api/v1/users", "/api/v1/login", "/api/v1/users/signup", "/error").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
 
                         // 2. 작품 조회(GET)는 누구나 가능
                         .requestMatchers(HttpMethod.GET, "/api/v1/artworks/**").permitAll()
 
-                        // 3. 작품 관리(등록, 수정, 삭제)는 'ADMIN'만 가능 ✨ (여기 수정!)
+                        // 3. 작품 관리
                         .requestMatchers(HttpMethod.POST, "/api/v1/artworks").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/artworks/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/artworks/**").hasRole("ADMIN")

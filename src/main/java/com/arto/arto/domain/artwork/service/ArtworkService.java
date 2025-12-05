@@ -28,41 +28,38 @@ public class ArtworkService {
     private final MoodRepository moodRepository;
 
     @Transactional
-    public Long createArtwork(String userEmail, ArtworkCreateRequestDto requestDto) {
-        // 1. 작가(로그인한 유저) 찾기
-        UsersEntity artist = usersRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません。")); // 사용자를 찾을 수 없습니다.
+    public Long createArtwork(String email, ArtworkCreateRequestDto requestDto) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("작가를 찾을 수 없습니다."));
 
-        // 2. 태그들(Color, Space, Mood) ID로 찾아오기
-        // (ID가 없거나 null이면 빈 리스트 반환)
-        List<ColorEntity> colors = requestDto.getColorIds() != null ?
-                colorRepository.findAllById(requestDto.getColorIds()) : List.of();
+        // 1. 태그 데이터 가져오기
+        List<ColorEntity> colors = colorRepository.findAllById(requestDto.getColorIds());
+        List<SpaceEntity> spaces = spaceRepository.findAllById(requestDto.getSpaceIds());
+        List<MoodEntity> moods = moodRepository.findAllById(requestDto.getMoodIds());
 
-        List<SpaceEntity> spaces = requestDto.getSpaceIds() != null ?
-                spaceRepository.findAllById(requestDto.getSpaceIds()) : List.of();
-
-        List<MoodEntity> moods = requestDto.getMoodIds() != null ?
-                moodRepository.findAllById(requestDto.getMoodIds()) : List.of();
-
-        // 3. 엔티티 생성
+        // 2. 작품 엔티티 생성
         ArtworkEntity artwork = ArtworkEntity.builder()
                 .title(requestDto.getTitle())
                 .description(requestDto.getDescription())
-                .morph(requestDto.getMorph())
-                .shippingMethod(requestDto.getShippingMethod())
-                .price(requestDto.getPrice())
-                .shippingCost(requestDto.getShippingCost())
+                .artist(user)
                 .dimensions(requestDto.getDimensions())
+                .shippingCost(requestDto.getShippingCost())
                 .thumbnailImageUrl(requestDto.getThumbnailImageUrl())
-                .status(ArtworkStatus.AVAILABLE) // 기본 상태: 판매 중
-                .artist(artist) // 작가 연결
-                .colors(new HashSet<>(colors)) // 태그 연결
-                .spaces(new HashSet<>(spaces))
-                .moods(new HashSet<>(moods))
+                .morph(requestDto.getMorph())
+                .price(requestDto.getPrice())
+                .shippingMethod(requestDto.getShippingMethod())
+                .status(ArtworkStatus.AVAILABLE)
                 .build();
 
-        // 4. 저장
-        return artworkRepository.save(artwork).getId();
+        ArtworkEntity savedArtwork = artworkRepository.saveAndFlush(artwork);
+
+        savedArtwork.setColors(colors);
+        savedArtwork.setSpaces(spaces);
+        savedArtwork.setMoods(moods);
+
+        artworkRepository.save(savedArtwork);
+
+        return savedArtwork.getId();
     }
 
     @Transactional(readOnly = true)

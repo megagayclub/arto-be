@@ -27,7 +27,7 @@ public class UsersController {
     private final UsersService usersService;
 
     //회원가입 API[POST] /api/v1/users
-    @PostMapping("/users")
+    @PostMapping("/users/signup")
     public ResponseEntity<Map<String, Object>> signUp(@RequestBody @Valid SignUpRequestDto requestDto) {
         Long userId = usersService.signUp(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
