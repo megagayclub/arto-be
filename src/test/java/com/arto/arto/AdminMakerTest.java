@@ -1,12 +1,14 @@
 package com.arto.arto;
 
+import com.arto.arto.domain.admins.entity.AdminsEntity; // 👈 import 추가됨
+import com.arto.arto.domain.admins.repository.AdminsRepository;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import com.arto.arto.domain.users.repository.UsersRepository;
 import com.arto.arto.domain.users.type.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder; // 패스워드 인코더 추가
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +20,9 @@ public class AdminMakerTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private AdminsRepository adminsRepository;
 
     @Test
     @Transactional
@@ -33,13 +38,13 @@ public class AdminMakerTest {
                             .email(targetEmail)
                             .password(passwordEncoder.encode("Password123!"))
                             .name("슈퍼관리자")
-                            .role(Role.ADMIN) // 태어날 때부터 관리자
+                            .role(Role.ADMIN)
                             .isActive(true)
                             .build();
                     return usersRepository.save(newUser);
                 });
 
-        if (!user.getPassword().startsWith("$2a$")) { // 암호화 안 된 거라면
+        if (!user.getPassword().startsWith("$2a$")) {
             user.setPassword(passwordEncoder.encode("Password123!"));
         }
 
@@ -49,6 +54,15 @@ public class AdminMakerTest {
             usersRepository.save(user);
         }
 
-        System.out.println(targetEmail + " 계정이 관리자가 되어버림");
+        if (adminsRepository.findByUser(user).isEmpty()) {
+            AdminsEntity admin = AdminsEntity.builder()
+                    .user(user)
+                    .adminLevel(1) // 관리자 레벨 (임의로 1 설정)
+                    .build();
+            adminsRepository.save(admin);
+            System.out.println("tbl_admins 테이블에도 관리자 정보 등록 완료");
+        }
+
+        System.out.println(targetEmail + " 계정이 완벽한 관리자가 되어버림");
     }
 }

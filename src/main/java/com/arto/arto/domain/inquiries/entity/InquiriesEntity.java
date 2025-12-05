@@ -5,10 +5,20 @@ import com.arto.arto.domain.inquiries.type.InquiryCategory;
 import com.arto.arto.domain.inquiries.type.InquiryStatus;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.*;
 import java.time.LocalDateTime;
+import com.arto.arto.domain.inquiry_answers.entity.InquiryAnswersEntity;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "tbl_inquiries")
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class InquiriesEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,5 +55,7 @@ public class InquiriesEntity {
     @Column(nullable = false)
     private InquiryCategory category;
 
-    // Getters and Setters
+    //질문에 달린 답변 가져오기
+    @OneToMany(mappedBy = "inquiry", fetch = FetchType.LAZY)
+    private List<InquiryAnswersEntity> answers = new ArrayList<>();
 }
