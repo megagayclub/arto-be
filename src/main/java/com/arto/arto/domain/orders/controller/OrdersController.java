@@ -2,6 +2,7 @@ package com.arto.arto.domain.orders.controller;
 
 import com.arto.arto.domain.orders.dto.request.OrderCheckoutRequest;
 import com.arto.arto.domain.orders.dto.request.OrderCreateRequest;
+import com.arto.arto.domain.orders.dto.request.ShippingInfoUpdateRequest;
 import com.arto.arto.domain.orders.dto.response.OrderResponse;
 import com.arto.arto.domain.orders.service.OrdersService;
 import jakarta.validation.Valid;
@@ -42,5 +43,20 @@ public class OrdersController {
     @GetMapping("/user/{userId}")
     public List<OrderResponse> getUserOrders(@PathVariable Long userId) {
         return ordersService.getUserOrders(userId);
+    }
+
+    //관리자 페이지에서 쇼핑 정보 업데이트 시킴
+    @PatchMapping("/{orderId}/shipping")
+    public OrderResponse updateShippingInfo(
+            @PathVariable Long orderId,
+            @Valid @RequestBody ShippingInfoUpdateRequest request
+    ) {
+        return ordersService.updateShippingInfo(orderId, request);
+    }
+
+    // ✅ 배송 완료 처리
+    @PatchMapping("/{orderId}/complete")
+    public OrderResponse completeDelivery(@PathVariable Long orderId) {
+        return ordersService.completeDelivery(orderId);
     }
 }

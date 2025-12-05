@@ -6,9 +6,11 @@ import com.arto.arto.domain.cart_items.entity.CartItemsEntity;
 import com.arto.arto.domain.cart_items.repository.CartItemsRepository;
 import com.arto.arto.domain.orders.dto.request.OrderCheckoutRequest;
 import com.arto.arto.domain.orders.dto.request.OrderCreateRequest;
+import com.arto.arto.domain.orders.dto.request.ShippingInfoUpdateRequest;
 import com.arto.arto.domain.orders.dto.response.OrderResponse;
 import com.arto.arto.domain.orders.entity.OrdersEntity;
 import com.arto.arto.domain.orders.repository.OrdersRepository;
+import com.arto.arto.domain.orders.type.OrderStatus;
 import com.arto.arto.domain.shopping_carts.entity.ShoppingCartsEntity;
 import com.arto.arto.domain.shopping_carts.repository.ShoppingCartsRepository;
 import com.arto.arto.domain.users.entity.UsersEntity;
@@ -49,8 +51,8 @@ public class OrdersService {
         order.setBuyer(buyer);
         order.setArtwork(artwork);
         order.setOrderDate(LocalDate.now());
-        order.setTotalAmount(request.getTotalAmount());
-        order.setOrderStatus("PENDING");
+        order.setTotalAmount(artwork.getPrice());
+        order.setOrderStatus(OrderStatus.PENDING);
         order.setPostCode(request.getPostCode());
         order.setShippingAddress(request.getShippingAddress());
         order.setShippingPhoneNumber(request.getShippingPhoneNumber());
@@ -99,9 +101,8 @@ public class OrdersService {
             order.setBuyer(buyer);
             order.setArtwork(artwork);
             order.setOrderDate(LocalDate.now());
-            // ArtworkEntity.price는 BigDecimal, OrdersEntity.totalAmount는 Integer라 캐스팅 필요
             order.setTotalAmount(artwork.getPrice());
-            order.setOrderStatus("PENDING"); // 기본 상태
+            order.setOrderStatus(OrderStatus.PENDING); // 기본 상태
             order.setPostCode(request.getPostCode());
             order.setShippingAddress(request.getShippingAddress());
             order.setShippingPhoneNumber(request.getShippingPhoneNumber());
@@ -141,4 +142,53 @@ public class OrdersService {
                 .map(OrderResponse::fromEntity)
                 .toList();
     }
+
+    //배송 정보 업데이트 메서드
+    @Transactional
+    public OrderResponse updateShippingInfo(Long orderId, ShippingInfoUpdateRequest request) {
+
+        OrdersEntity order = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "주문을 찾을 수 없습니다."
+                ));
+
+        order.setShippingCarrier(request.getShippingCarrier());
+        order.setTrackingNumber(request.getTrackingNumber());
+
+        // 처음 배송정보 입력되는 시점에 배송 시작 처리도 같이 할 수 있음
+        if (order.getDeliveryStartDate() == null) {
+            order.setDeliveryStartDate(LocalDate.now());
+        }
+        order.setOrderStatus(OrderStatus.SHIPPED); // 상태도 변경 (원하면)
+
+        OrdersEntity saved = ordersRepository.save(order);
+        return OrderResponse.fromEntity(saved);
+    }
+
+    // 배송 완료 처리
+    @Transactional
+    public OrderResponse completeDelivery(Long orderId) {
+
+        OrdersEntity order = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "주문을 찾을 수 없습니다."
+                ));
+
+        // 이미 배송 완료된 주문이면 막을지, 그냥 두실지는 자유
+        if (order.getOrderStatus() == OrderStatus.DELIVERED) {
+            throw new CustomException(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "이미 배송 완료된 주문입니다."
+            );
+        }
+
+        order.setOrderStatus(OrderStatus.DELIVERED);
+        order.setDeliveryCompletedDate(LocalDate.now());
+
+        OrdersEntity saved = ordersRepository.save(order);
+        return OrderResponse.fromEntity(saved);
+    }
+
 }

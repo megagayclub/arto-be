@@ -2,6 +2,7 @@ package com.arto.arto.domain.orders.entity;
 
 import com.arto.arto.domain.artwork.entity.ArtworkEntity;
 import com.arto.arto.domain.users.entity.UsersEntity;
+import com.arto.arto.domain.orders.type.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -33,8 +34,9 @@ public class OrdersEntity {
     @Column(name = "total_amount", nullable = false)
     private BigDecimal totalAmount;
 
-    @Column(name = "order_status", nullable = false)
-    private String orderStatus;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "order_status", nullable = false, length = 20)
+    private OrderStatus orderStatus;
 
     @Column(name = "post_code", nullable = false)
     private Integer postCode;
@@ -52,5 +54,11 @@ public class OrdersEntity {
     private LocalDate deliveryStartDate;
 
     @Column(name = "delivery_completed_date")
-    private LocalDate deliver;
+    private LocalDate deliveryCompletedDate;
+
+    @Column(name = "shipping_carrier")  // 예: CJ대한통운, 로젠, 일본엔 야마토 등
+    private String shippingCarrier;
+
+    @Column(name = "tracking_number")   // 운송장 번호
+    private String trackingNumber;
 }
