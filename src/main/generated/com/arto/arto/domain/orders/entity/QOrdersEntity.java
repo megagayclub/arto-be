@@ -26,7 +26,7 @@ public class QOrdersEntity extends EntityPathBase<OrdersEntity> {
 
     public final com.arto.arto.domain.users.entity.QUsersEntity buyer;
 
-    public final DatePath<java.time.LocalDate> deliver = createDate("deliver", java.time.LocalDate.class);
+    public final DatePath<java.time.LocalDate> deliveryCompletedDate = createDate("deliveryCompletedDate", java.time.LocalDate.class);
 
     public final DatePath<java.time.LocalDate> deliveryStartDate = createDate("deliveryStartDate", java.time.LocalDate.class);
 
@@ -34,7 +34,7 @@ public class QOrdersEntity extends EntityPathBase<OrdersEntity> {
 
     public final DatePath<java.time.LocalDate> orderDate = createDate("orderDate", java.time.LocalDate.class);
 
-    public final StringPath orderStatus = createString("orderStatus");
+    public final EnumPath<com.arto.arto.domain.orders.type.OrderStatus> orderStatus = createEnum("orderStatus", com.arto.arto.domain.orders.type.OrderStatus.class);
 
     public final NumberPath<Integer> postCode = createNumber("postCode", Integer.class);
 
@@ -42,9 +42,13 @@ public class QOrdersEntity extends EntityPathBase<OrdersEntity> {
 
     public final StringPath shippingAddress = createString("shippingAddress");
 
+    public final StringPath shippingCarrier = createString("shippingCarrier");
+
     public final StringPath shippingPhoneNumber = createString("shippingPhoneNumber");
 
-    public final NumberPath<Integer> totalAmount = createNumber("totalAmount", Integer.class);
+    public final NumberPath<java.math.BigDecimal> totalAmount = createNumber("totalAmount", java.math.BigDecimal.class);
+
+    public final StringPath trackingNumber = createString("trackingNumber");
 
     public QOrdersEntity(String variable) {
         this(OrdersEntity.class, forVariable(variable), INITS);

@@ -63,7 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
 
                         // 4. 나머지는 다 로그인해야 함
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
+                        //.anyRequest().authenticated()  더미데이터 생기고 테스트할때는 이렇게 바꿔야함
                 );
 
         // TODO: 나중에 여기에 'JwtAuthenticationFilter'를 추가해야 합니다.
