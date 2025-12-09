@@ -24,7 +24,11 @@ public class CartItemResponse {
                 .cartItemId(entity.getId())
                 .artworkId(artwork.getId())
                 .title(artwork.getTitle())
-                .artistName(artwork.getArtistName())
+                .artistName(
+                        artwork.getArtist() != null
+                                ? artwork.getArtist().getName()
+                                : null
+                )
                 .price(artwork.getPrice())
                 .thumbnailImageUrl(artwork.getThumbnailImageUrl())
                 .build();
