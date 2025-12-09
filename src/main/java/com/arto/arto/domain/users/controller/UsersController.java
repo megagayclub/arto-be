@@ -5,6 +5,7 @@ import com.arto.arto.domain.users.dto.request.SignUpRequestDto;
 import com.arto.arto.domain.users.dto.response.UserResponseDto;
 import com.arto.arto.domain.users.dto.request.PasswordChangeRequestDto;
 import com.arto.arto.domain.users.dto.request.UserUpdateRequestDto;
+import com.arto.arto.domain.users.dto.request.PasswordResetConfirmDto;
 import com.arto.arto.domain.users.service.UsersService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-
+import com.arto.arto.domain.users.dto.request.PasswordResetRequestDto;
 import java.util.Map;
 
 @RestController
@@ -85,5 +86,25 @@ public class UsersController {
         usersService.withdraw(userDetails.getUsername());
 
         return ResponseEntity.noContent().build(); // 204 No Content 반환
+    }
+
+    // 비밀번호 재설정 요청 (이메일 발송) API [POST] /api/v1/users/reset-password-request
+    @PostMapping("/users/reset-password-request")
+    public ResponseEntity<Map<String, String>> requestPasswordReset(
+            @RequestBody @Valid PasswordResetRequestDto requestDto) {
+
+        usersService.sendResetLink(requestDto.getEmail());
+
+        return ResponseEntity.ok(Map.of("message", "パスワード再設定メールを送信しました。")); // 재설정 메일을 보냈습니다.
+    }
+
+    //메일로 비밀번호 변경할때
+    @PostMapping("/users/reset-password")
+    public ResponseEntity<Map<String, String>> resetPassword(
+            @RequestBody @Valid PasswordResetConfirmDto requestDto) {
+
+        usersService.resetPassword(requestDto.getToken(), requestDto.getNewPassword());
+
+        return ResponseEntity.ok(Map.of("message", "パスワードが変更されました。")); // 비밀번호가 변경되었습니다.
     }
 }

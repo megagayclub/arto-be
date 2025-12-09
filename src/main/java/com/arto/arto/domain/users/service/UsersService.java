@@ -6,12 +6,15 @@ import com.arto.arto.domain.users.dto.request.UserUpdateRequestDto;
 import com.arto.arto.domain.users.dto.response.UserResponseDto;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import com.arto.arto.domain.users.repository.UsersRepository;
-import com.arto.arto.domain.users.type.Role; // 👈 파트너님의 Role Enum 위치 확인!
+import com.arto.arto.domain.users.type.Role;
 import com.arto.arto.global.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.arto.arto.domain.users.entity.PasswordResetTokenEntity;
+import com.arto.arto.domain.users.repository.PasswordResetTokenRepository;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +23,8 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordResetTokenRepository tokenRepository;
+    private final EmailService emailService;
 
     /**
      * 회원가입
@@ -39,7 +44,7 @@ public class UsersService {
                 .email(requestDto.getEmail())
                 .password(encodedPassword)
                 .name(requestDto.getName())
-                .role(Role.USER) // ✨ 중요: 가입 시 기본은 일반 유저
+                .role(Role.USER)
                 .build();
 
         // 4. DB 저장
@@ -64,7 +69,6 @@ public class UsersService {
         }
 
         // 4. 토큰 발급 (이메일 + 권한 정보 전달)
-        // ✨ 중요: Role 정보를 같이 넘겨야 어드민 권한 체크가 가능합니다.
         return jwtTokenProvider.createToken(user.getEmail(), user.getRole().name());
     }
 
@@ -93,7 +97,7 @@ public class UsersService {
     }
 
     /**
-     * 비밀번호 변경
+     * 마이페이지 비밀번호 변경
      */
     @Transactional
     public void changePassword(String email, PasswordChangeRequestDto requestDto) {
@@ -110,6 +114,29 @@ public class UsersService {
     }
 
     /**
+     * 로그인 과정에서 메일로 비밀번호 변경
+     */
+    @Transactional
+    public void resetPassword(String token, String newPassword) {
+        // 1. 토큰으로 DB 조회
+        PasswordResetTokenEntity resetToken = tokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("有効ではないトークンです。")); // 유효하지 않은 토큰
+
+        // 2. 만료 시간 확인
+        if (resetToken.isExpired()) {
+            throw new IllegalArgumentException("期限切れのトークンです。"); // 만료된 토큰
+        }
+
+        // 3. 비밀번호 변경 (암호화 필수!)
+        UsersEntity user = resetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        usersRepository.save(user);
+
+        // 4. 사용한 토큰 삭제 (재사용 방지)
+        tokenRepository.delete(resetToken);
+    }
+
+    /**
      * 회원 탈퇴
      */
     @Transactional
@@ -118,5 +145,41 @@ public class UsersService {
                 .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません。"));
 
         user.setActive(false); // 논리적 삭제 (비활성화)
+    }
+
+    @Transactional
+    public void sendResetLink(String email) {
+        // 1. 유저 확인
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません。"));
+
+        // 2. 기존에 발급된 토큰이 있다면 삭제 (새로 발급하기 위해)
+        tokenRepository.findByUser(user).ifPresent(token -> {
+            tokenRepository.delete(token);
+            tokenRepository.flush(); // 즉시 삭제 반영
+        });
+
+        // 3. 랜덤 토큰 생성 (예: a1b2-c3d4-...)
+        String token = UUID.randomUUID().toString();
+
+        // 4. DB에 토큰 저장
+        PasswordResetTokenEntity resetToken = PasswordResetTokenEntity.builder()
+                .token(token)
+                .user(user)
+                .expiryDate(java.time.LocalDateTime.now().plusHours(24)) // 24시간 유효
+                .build();
+
+        tokenRepository.save(resetToken);
+
+        // 5. 이메일 발송
+        // (실제 서비스에선 프론트엔드 주소로 보내야 함. 여기선 테스트용 로컬 주소)
+        String resetLink = "http://localhost:8080/api/v1/users/reset-password?token=" + token;
+
+        String subject = "[Arto] パスワード再設定リンク"; // [Arto] 비밀번호 재설정 링크
+        String text = "<p>以下のリンクをクリックしてパスワードを再設定してください。</p>" + // 아래 링크를 클릭해서 비번 재설정하세요
+                "<a href='" + resetLink + "'>パスワード再設定</a><br><br>" +
+                "(リンクは24時間有効です)"; // 링크는 24시간 유효
+
+        emailService.sendEmail(user.getEmail(), subject, text);
     }
 }
