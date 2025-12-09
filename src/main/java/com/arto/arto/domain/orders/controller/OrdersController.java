@@ -1,8 +1,11 @@
 package com.arto.arto.domain.orders.controller;
 
+import com.arto.arto.domain.orders.dto.request.OrderCheckoutRequest;
 import com.arto.arto.domain.orders.dto.request.OrderCreateRequest;
+import com.arto.arto.domain.orders.dto.request.ShippingInfoUpdateRequest;
 import com.arto.arto.domain.orders.dto.response.OrderResponse;
 import com.arto.arto.domain.orders.service.OrdersService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,21 +18,45 @@ public class OrdersController {
 
     private final OrdersService ordersService;
 
-    // 주문 생성
+    // 🎯 단일 주문 생성 (바로 작품에서 주문할 때)
     @PostMapping
     public OrderResponse createOrder(@RequestBody OrderCreateRequest request) {
         return ordersService.createOrder(request);
     }
 
+    // 🎯 장바구니 → 주문 여러 개 생성
+    @PostMapping("/checkout/{userId}")
+    public List<OrderResponse> checkoutFromCart(
+            @PathVariable Long userId,
+            @Valid @RequestBody OrderCheckoutRequest request
+    ) {
+        return ordersService.checkoutFromCart(userId, request);
+    }
+
     // 주문 상세 조회
-    @GetMapping("/{id}")
-    public OrderResponse getOrder(@PathVariable Long id) {
-        return ordersService.getOrder(id);
+    @GetMapping("/{orderId}")
+    public OrderResponse getOrder(@PathVariable Long orderId) {
+        return ordersService.getOrder(orderId);
     }
 
     // 특정 유저 주문 목록 조회
     @GetMapping("/user/{userId}")
     public List<OrderResponse> getUserOrders(@PathVariable Long userId) {
         return ordersService.getUserOrders(userId);
+    }
+
+    //관리자 페이지에서 쇼핑 정보 업데이트 시킴
+    @PatchMapping("/{orderId}/shipping")
+    public OrderResponse updateShippingInfo(
+            @PathVariable Long orderId,
+            @Valid @RequestBody ShippingInfoUpdateRequest request
+    ) {
+        return ordersService.updateShippingInfo(orderId, request);
+    }
+
+    // ✅ 배송 완료 처리
+    @PatchMapping("/{orderId}/complete")
+    public OrderResponse completeDelivery(@PathVariable Long orderId) {
+        return ordersService.completeDelivery(orderId);
     }
 }
