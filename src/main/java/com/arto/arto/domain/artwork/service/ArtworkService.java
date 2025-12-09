@@ -1,44 +1,85 @@
 package com.arto.arto.domain.artwork.service;
 
-import com.arto.arto.domain.artwork.dto.response.ArtworkDetailResponse;
-import com.arto.arto.domain.artwork.dto.response.ArtworkSimpleResponse;
-import com.arto.arto.domain.artwork.entity.ArtworkEntity;
-import com.arto.arto.domain.artwork.repository.ArtworkRepository;
-import com.arto.arto.global.common.dto.request.PageRequestDto;
-import com.arto.arto.global.common.dto.response.PageResponse;
-import com.arto.arto.global.exception.CustomException;
+import com.arto.arto.domain.artwork.dto.request.ArtworkCreateRequestDto;
+import com.arto.arto.domain.artwork.dto.response.ArtworkDetailResponseDto;
+import com.arto.arto.domain.artwork.entity.*;
+import com.arto.arto.domain.artwork.repository.*;
+import com.arto.arto.domain.artwork.type.ArtworkStatus;
+import com.arto.arto.domain.users.entity.UsersEntity;
+import com.arto.arto.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.arto.arto.domain.artwork.dto.request.ArtworkSearchCondition;
+import com.arto.arto.domain.artwork.dto.response.ArtworkSimpleResponseDto;
+import java.util.stream.Collectors;
+
+import java.util.HashSet;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
+    private final UsersRepository usersRepository;
+    private final ColorRepository colorRepository;
+    private final SpaceRepository spaceRepository;
+    private final MoodRepository moodRepository;
 
-    public PageResponse<ArtworkSimpleResponse> getArtworks(PageRequestDto pageRequestDto) {
-        Pageable pageable = pageRequestDto.toPageable(); // PageRequest에 이런 메서드 있다고 가정
+    @Transactional
+    public Long createArtwork(String email, ArtworkCreateRequestDto requestDto) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("작가를 찾을 수 없습니다."));
 
-        Page<ArtworkEntity> page = artworkRepository.findAll(pageable);
+        // 1. 태그 데이터 가져오기
+        List<ColorEntity> colors = colorRepository.findAllById(requestDto.getColorIds());
+        List<SpaceEntity> spaces = spaceRepository.findAllById(requestDto.getSpaceIds());
+        List<MoodEntity> moods = moodRepository.findAllById(requestDto.getMoodIds());
 
-        return PageResponse.of(
-                page.map(ArtworkSimpleResponse::fromEntity)
-        );
+        // 2. 작품 엔티티 생성
+        ArtworkEntity artwork = ArtworkEntity.builder()
+                .title(requestDto.getTitle())
+                .description(requestDto.getDescription())
+                .artist(user)
+                .dimensions(requestDto.getDimensions())
+                .shippingCost(requestDto.getShippingCost())
+                .thumbnailImageUrl(requestDto.getThumbnailImageUrl())
+                .morph(requestDto.getMorph())
+                .price(requestDto.getPrice())
+                .shippingMethod(requestDto.getShippingMethod())
+                .status(ArtworkStatus.AVAILABLE)
+                .build();
+
+        ArtworkEntity savedArtwork = artworkRepository.saveAndFlush(artwork);
+
+        savedArtwork.setColors(colors);
+        savedArtwork.setSpaces(spaces);
+        savedArtwork.setMoods(moods);
+
+        artworkRepository.save(savedArtwork);
+
+        return savedArtwork.getId();
     }
 
-    public ArtworkDetailResponse getArtwork(Long id) {
-        ArtworkEntity entity = artworkRepository.findById(id)
-                .orElseThrow(() ->
-                        new CustomException(
-                                HttpStatus.NOT_FOUND.value(),        // status
-                                "해당 작품을 찾을 수 없습니다."        // message
-                        )
-                );
-        return ArtworkDetailResponse.fromEntity(entity);
+    @Transactional(readOnly = true)
+    public ArtworkDetailResponseDto getArtworkDetail(Long artworkId) {
+        ArtworkEntity artwork = artworkRepository.findById(artworkId)
+                .orElseThrow(() -> new IllegalArgumentException("作品が見つかりません。")); // 작품을 찾을 수 없습니다.
+
+        return ArtworkDetailResponseDto.fromEntity(artwork);
     }
+
+    @Transactional(readOnly = true)
+    public List<ArtworkSimpleResponseDto> getArtworkList(ArtworkSearchCondition condition) {
+        // 1. QueryDSL로 조건에 맞는 작품들 찾아오기
+        List<ArtworkEntity> artworks = artworkRepository.search(condition);
+
+        // 2. Entity 리스트를 -> DTO 리스트로 변환 (요약 정보만)
+        return artworks.stream()
+                .map(ArtworkSimpleResponseDto::fromEntity)
+                .collect(Collectors.toList());
+    }
+
+
 }

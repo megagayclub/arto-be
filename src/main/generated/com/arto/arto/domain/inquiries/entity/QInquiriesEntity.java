@@ -24,6 +24,8 @@ public class QInquiriesEntity extends EntityPathBase<InquiriesEntity> {
 
     public final com.arto.arto.domain.admins.entity.QAdminsEntity admin;
 
+    public final ListPath<com.arto.arto.domain.inquiry_answers.entity.InquiryAnswersEntity, com.arto.arto.domain.inquiry_answers.entity.QInquiryAnswersEntity> answers = this.<com.arto.arto.domain.inquiry_answers.entity.InquiryAnswersEntity, com.arto.arto.domain.inquiry_answers.entity.QInquiryAnswersEntity>createList("answers", com.arto.arto.domain.inquiry_answers.entity.InquiryAnswersEntity.class, com.arto.arto.domain.inquiry_answers.entity.QInquiryAnswersEntity.class, PathInits.DIRECT2);
+
     public final com.arto.arto.domain.artwork.entity.QArtworkEntity artwork;
 
     public final EnumPath<com.arto.arto.domain.inquiries.type.InquiryCategory> category = createEnum("category", com.arto.arto.domain.inquiries.type.InquiryCategory.class);
@@ -59,7 +61,7 @@ public class QInquiriesEntity extends EntityPathBase<InquiriesEntity> {
     public QInquiriesEntity(Class<? extends InquiriesEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.admin = inits.isInitialized("admin") ? new com.arto.arto.domain.admins.entity.QAdminsEntity(forProperty("admin"), inits.get("admin")) : null;
-        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork")) : null;
+        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork"), inits.get("artwork")) : null;
         this.sender = inits.isInitialized("sender") ? new com.arto.arto.domain.users.entity.QUsersEntity(forProperty("sender")) : null;
     }
 

@@ -48,7 +48,7 @@ public class QWishlistsEntity extends EntityPathBase<WishlistsEntity> {
 
     public QWishlistsEntity(Class<? extends WishlistsEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork")) : null;
+        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork"), inits.get("artwork")) : null;
         this.user = inits.isInitialized("user") ? new com.arto.arto.domain.users.entity.QUsersEntity(forProperty("user")) : null;
     }
 

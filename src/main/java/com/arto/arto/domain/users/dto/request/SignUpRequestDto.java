@@ -13,14 +13,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SignUpRequestDto {
 
-    @NotBlank(message = "이메일은 필수 입력 값입니다.")
-    @Email(message = "이메일 형식이 올바르지 않습니다.")
+    @NotBlank(message = "メールアドレスは必須項目です。")
+    @Email(message = "メールアドレスの形式が正しくありません。")
     private String email;
 
-    @NotBlank(message = "비밀번호는 필수 입력 값입니다.")
+    @NotBlank(message = "パスワードは必須項目です。")
     private String password;
 
-    @NotBlank(message = "이름은 필수 입력 값입니다.")
+    @NotBlank(message = "名前は必須項目です。")
     private String name;
 
     private String phoneNumber; // 선택

@@ -52,7 +52,7 @@ public class QArtworkImagesEntity extends EntityPathBase<ArtworkImagesEntity> {
 
     public QArtworkImagesEntity(Class<? extends ArtworkImagesEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork")) : null;
+        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork"), inits.get("artwork")) : null;
     }
 
 }

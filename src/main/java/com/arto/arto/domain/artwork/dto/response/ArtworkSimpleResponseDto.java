@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 
 @Getter
 @Builder
-public class ArtworkSimpleResponse {
+public class ArtworkSimpleResponseDto {
 
     private Long artworkId;
     private String title;
@@ -16,11 +16,14 @@ public class ArtworkSimpleResponse {
     private BigDecimal price;
     private String thumbnailImageUrl;
 
-    public static ArtworkSimpleResponse fromEntity(ArtworkEntity entity) {
-        return ArtworkSimpleResponse.builder()
+    public static ArtworkSimpleResponseDto fromEntity(ArtworkEntity entity) {
+        return ArtworkSimpleResponseDto.builder()
                 .artworkId(entity.getId())
                 .title(entity.getTitle())
-                .artistName(entity.getArtistName())
+
+                //작가 객체(getArtist)에서 이름(getName)을 꺼냅니다.
+                .artistName(entity.getArtist().getName())
+
                 .price(entity.getPrice())
                 .thumbnailImageUrl(entity.getThumbnailImageUrl())
                 .build();

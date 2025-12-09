@@ -32,7 +32,9 @@ dependencies {
 
 
 	// ✅ JWT (토큰 기반 인증)
-	implementation 'io.jsonwebtoken:jjwt:0.13.0'
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	// ✅ QueryDSL (타입 안전 쿼리)
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
@@ -58,8 +60,43 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'	//타임리프에서 스프링 시큐리티를 사용하기 위한 의존성
 	testImplementation 'org.springframework.security:spring-security-test'	//스프링 시큐리티를 테스트하기위한 의존성
+
+	// QueryDSL
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	//email인증 디펜더시
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs.add("-parameters")
+}
+
+tasks.withType(JavaCompile) {
+	options.compilerArgs.add("-parameters")
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+// 1. QueryDSL 설정용 변수
+def querydslDir = "$buildDir/generated/querydsl"
+
+// 2. 소스 세트 설정 (Gradle에게 "여기도 내 코드야"라고 알려줌)
+sourceSets {
+	main.java.srcDirs += [ querydslDir ]
+}
+
+// 3. 컴파일 작업 설정 (자바 컴파일할 때 Q파일도 같이 만들어!)
+tasks.withType(JavaCompile) {
+	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+}
+
+// 4. 청소 작업 설정 (clean 명령 실행 시 Q파일도 지워!)
+clean.doLast {
+	file(querydslDir).deleteDir()
 }

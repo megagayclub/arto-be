@@ -1,17 +1,31 @@
 package com.arto.arto.domain.artwork.entity;
 
 import com.arto.arto.domain.artwork.type.ArtworkStatus;
+import com.arto.arto.domain.artwork.type.Morph;
+import com.arto.arto.domain.artwork.type.ShippingMethod;
+import com.arto.arto.domain.users.entity.UsersEntity;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter
 @Entity
-@Table(name = "artworks")
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "tbl_artworks")
+@EntityListeners(AuditingEntityListener.class) // 날짜 자동 기록
 public class ArtworkEntity {
 
     @Id
@@ -19,68 +33,57 @@ public class ArtworkEntity {
     @Column(name = "artwork_id")
     private Long id;
 
-    @Column(name = "registered_by_admin_id")
-    private Long registeredByAdminId;
-
     @Column(nullable = false)
     private String title;
-
-    @Column(name = "short_description", length = 1000)
-    private String shortDescription;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "artist_name", nullable = false)
-    private String artistName;
-
-    @Column(name = "creation_year")
-    private Integer creationYear;
-
-    @Column
-    private String dimensions;
-
+    //중요: String이 아니라 Enum으로 변경했습니다!
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BigDecimal price;
+    private Morph morph; // 형태 (원형, 사각형 등)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private ArtworkStatus status;
+    private ArtworkStatus status; // 판매 상태
 
-    @Column(name = "frame_type")
-    private String frameType;
-
+    @Enumerated(EnumType.STRING)
     @Column(name = "shipping_method")
-    private String shippingMethod;
+    private ShippingMethod shippingMethod; // 배송 방식
 
-    @Column(name = "shipping_cost", precision = 10, scale = 2)
-    private BigDecimal shippingCost;
+    @Column(nullable = false)
+    private BigDecimal price; // 작품 가격
 
-    @Column(name = "thumbnail_image_url", nullable = false)
+    @Column(name = "shipping_cost")
+    private BigDecimal shippingCost; // 배송비
+
+    @Column(nullable = false)
+    private String dimensions; // 크기 (예: 50x50cm)
+
+    @Column(name = "thumbnail_image_url")
     private String thumbnailImageUrl;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    //작가 정보 (User 테이블과 연결)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artist_id")
+    private UsersEntity artist;
 
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt = LocalDateTime.now();
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
 
-    @Column(name = "view_count")
-    private int viewCount = 0;
+    @LastModifiedDate
+    private LocalDateTime updatedAt;
 
-    @Column(name = "inquiry_count")
-    private int inquiryCount = 0;
-
-    @Column
-    private String morph;
-
-    // 색상 / 공간 / 분위기 매핑
+    //태그 정보 연결 (색상, 공간, 분위기)
     @ManyToMany
     @JoinTable(
             name = "tbl_artwork_colors",
             joinColumns = @JoinColumn(name = "artwork_id"),
             inverseJoinColumns = @JoinColumn(name = "color_id")
     )
+    @Builder.Default // 빌더 패턴 사용 시 초기화 유지
     private Set<ColorEntity> colors = new HashSet<>();
 
     @ManyToMany
@@ -89,6 +92,7 @@ public class ArtworkEntity {
             joinColumns = @JoinColumn(name = "artwork_id"),
             inverseJoinColumns = @JoinColumn(name = "space_id")
     )
+    @Builder.Default
     private Set<SpaceEntity> spaces = new HashSet<>();
 
     @ManyToMany
@@ -97,8 +101,18 @@ public class ArtworkEntity {
             joinColumns = @JoinColumn(name = "artwork_id"),
             inverseJoinColumns = @JoinColumn(name = "mood_id")
     )
+    @Builder.Default
     private Set<MoodEntity> moods = new HashSet<>();
 
-    // 기본 생성자
-    public ArtworkEntity() {}
+    public void setColors(List<ColorEntity> colors) {
+        this.colors = new HashSet<>(colors);
+    }
+
+    public void setSpaces(List<SpaceEntity> spaces) {
+        this.spaces = new HashSet<>(spaces);
+    }
+
+    public void setMoods(List<MoodEntity> moods) {
+        this.moods = new HashSet<>(moods);
+    }
 }

@@ -68,7 +68,7 @@ public class QOrdersEntity extends EntityPathBase<OrdersEntity> {
 
     public QOrdersEntity(Class<? extends OrdersEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork")) : null;
+        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork"), inits.get("artwork")) : null;
         this.buyer = inits.isInitialized("buyer") ? new com.arto.arto.domain.users.entity.QUsersEntity(forProperty("buyer")) : null;
     }
 

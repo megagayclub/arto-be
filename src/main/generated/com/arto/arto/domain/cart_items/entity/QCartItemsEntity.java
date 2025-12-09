@@ -46,7 +46,7 @@ public class QCartItemsEntity extends EntityPathBase<CartItemsEntity> {
 
     public QCartItemsEntity(Class<? extends CartItemsEntity> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork")) : null;
+        this.artwork = inits.isInitialized("artwork") ? new com.arto.arto.domain.artwork.entity.QArtworkEntity(forProperty("artwork"), inits.get("artwork")) : null;
         this.cart = inits.isInitialized("cart") ? new com.arto.arto.domain.shopping_carts.entity.QShoppingCartsEntity(forProperty("cart"), inits.get("cart")) : null;
     }
 
