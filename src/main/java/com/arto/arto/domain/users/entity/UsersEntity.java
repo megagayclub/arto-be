@@ -41,6 +41,7 @@ public class UsersEntity {
     private Role role;
 
     @Column(name = "is_active", nullable = false)
+    @Builder.Default
     private boolean isActive = true; // 기본값을 true로 설정
 
     @Column(name = "last_login_at")

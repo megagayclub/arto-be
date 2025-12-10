@@ -24,11 +24,6 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider; // 필터에 넣을 거 주입받기
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
@@ -63,11 +58,14 @@ public class SecurityConfig {
 
                         // 2. 작품 조회(GET)는 누구나 가능
                         .requestMatchers(HttpMethod.GET, "/api/v1/artworks/**").permitAll()
+                        //찜하기 등록 어드민도 허용한 이유는 테스트할때 그냥 하려고 넣어둠
+                        .requestMatchers("/api/v1/wishlists/**").hasAnyRole("USER", "ADMIN")
 
                         // 3. 작품 관리
                         .requestMatchers(HttpMethod.POST, "/api/v1/artworks").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/artworks/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/artworks/**").hasRole("ADMIN")
+
 
                         // 4. 나머지는 로그인만 하면 됨 (내 정보 수정, 탈퇴 등)
                         .anyRequest().authenticated()

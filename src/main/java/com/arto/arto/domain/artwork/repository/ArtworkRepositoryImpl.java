@@ -44,7 +44,7 @@ public class ArtworkRepositoryImpl implements ArtworkRepositoryCustom {
     private BooleanExpression keywordContains(String keyword) {
         return keyword != null ?
                 artworkEntity.title.contains(keyword)
-                        .or(artworkEntity.artist.name.contains(keyword)) : null;
+                        .or(artworkEntity.artistName.contains(keyword)) : null;
     }
 
     // 2. 가격 (최소 가격 이상)

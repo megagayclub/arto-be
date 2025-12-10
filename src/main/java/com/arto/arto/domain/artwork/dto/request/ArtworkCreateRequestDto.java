@@ -17,6 +17,9 @@ public class ArtworkCreateRequestDto {
     @NotBlank(message = "作品名は必須です。") // 작품명은 필수입니다.
     private String title;
 
+    @NotBlank(message = "作家名は必須です。") // 작가 이름은 필수입니다.
+    private String artistName;
+
     private String description;
 
     @NotNull(message = "形態は必須です。") // 형태는 필수입니다.

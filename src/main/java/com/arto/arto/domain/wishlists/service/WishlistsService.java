@@ -9,7 +9,9 @@ import com.arto.arto.domain.wishlists.repository.WishlistsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.arto.arto.domain.wishlists.dto.response.WishlistResponseDto;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
 @Service
@@ -44,5 +46,16 @@ public class WishlistsService {
             wishlistsRepository.save(wishlist);
             return true; // 추가됨
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<WishlistResponseDto> getMyWishlists(String email) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません。"));
+
+        // DB에서 가져와서 DTO로 변환
+        return wishlistsRepository.findAllByUserOrderByAddedAtDesc(user).stream()
+                .map(WishlistResponseDto::fromEntity)
+                .collect(Collectors.toList());
     }
 }

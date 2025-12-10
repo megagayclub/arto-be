@@ -22,7 +22,7 @@ public class ArtworkSimpleResponseDto {
                 .title(entity.getTitle())
 
                 //작가 객체(getArtist)에서 이름(getName)을 꺼냅니다.
-                .artistName(entity.getArtist().getName())
+                .artistName(entity.getArtistName())
 
                 .price(entity.getPrice())
                 .thumbnailImageUrl(entity.getThumbnailImageUrl())
