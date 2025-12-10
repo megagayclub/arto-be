@@ -23,8 +23,10 @@ public class SignUpRequestDto {
     @NotBlank(message = "名前は必須項目です。")
     private String name;
 
+
     private String phoneNumber; // 선택
 
+    @NotBlank(message = "住所は必須です。")
     private String address;     // 선택
 
     // DTO를 Entity로 변환하는 메서드 (Service에서 사용)
