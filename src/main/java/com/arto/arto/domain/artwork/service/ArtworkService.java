@@ -41,7 +41,7 @@ public class ArtworkService {
         ArtworkEntity artwork = ArtworkEntity.builder()
                 .title(requestDto.getTitle())
                 .description(requestDto.getDescription())
-                .artist(user)
+                .artistName(requestDto.getArtistName())
                 .dimensions(requestDto.getDimensions())
                 .shippingCost(requestDto.getShippingCost())
                 .thumbnailImageUrl(requestDto.getThumbnailImageUrl())

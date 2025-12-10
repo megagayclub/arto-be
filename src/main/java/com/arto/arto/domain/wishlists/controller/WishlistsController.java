@@ -6,7 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
+import com.arto.arto.domain.wishlists.dto.response.WishlistResponseDto;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -29,5 +30,14 @@ public class WishlistsController {
                 "message", message,
                 "isAdded", isAdded
         ));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<WishlistResponseDto>> getMyWishlists(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        List<WishlistResponseDto> response = wishlistsService.getMyWishlists(userDetails.getUsername());
+
+        return ResponseEntity.ok(response);
     }
 }

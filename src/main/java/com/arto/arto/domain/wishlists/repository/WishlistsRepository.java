@@ -5,6 +5,8 @@ import com.arto.arto.domain.users.entity.UsersEntity;
 import com.arto.arto.domain.wishlists.entity.WishlistsEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface WishlistsRepository extends JpaRepository<WishlistsEntity, Long> {
 
     // 1. 이미 찜했는지 확인
@@ -12,4 +14,6 @@ public interface WishlistsRepository extends JpaRepository<WishlistsEntity, Long
 
     // 2. 찜 취소 (삭제)
     void deleteByUserAndArtwork(UsersEntity user, ArtworkEntity artwork);
+
+    List<WishlistsEntity> findAllByUserOrderByAddedAtDesc(UsersEntity user);
 }

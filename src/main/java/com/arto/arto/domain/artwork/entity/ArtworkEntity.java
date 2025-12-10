@@ -64,10 +64,9 @@ public class ArtworkEntity {
     @Column(name = "thumbnail_image_url")
     private String thumbnailImageUrl;
 
-    //작가 정보 (User 테이블과 연결)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_id")
-    private UsersEntity artist;
+    //작가 이름
+    @Column(nullable = false)
+    private String artistName;
 
     @CreatedDate
     @Column(updatable = false)

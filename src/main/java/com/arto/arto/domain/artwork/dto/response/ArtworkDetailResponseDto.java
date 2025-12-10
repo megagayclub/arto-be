@@ -48,8 +48,8 @@ public class ArtworkDetailResponseDto {
                 .description(entity.getDescription())
 
                 //작가 정보 추출
-                .artistName(entity.getArtist().getName())
-                .artistId(entity.getArtist().getUserId())
+                .artistName(entity.getArtistName())
+                .artistId(null)
 
                 //Enum -> String 변환 (.name())
                 .morph(entity.getMorph().name())

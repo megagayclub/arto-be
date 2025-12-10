@@ -56,6 +56,7 @@ public class InquiriesEntity {
     private InquiryCategory category;
 
     //질문에 달린 답변 가져오기
+    @Builder.Default
     @OneToMany(mappedBy = "inquiry", fetch = FetchType.LAZY)
     private List<InquiryAnswersEntity> answers = new ArrayList<>();
 }
