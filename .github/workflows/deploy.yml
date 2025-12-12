@@ -64,6 +64,4 @@ jobs:
               -e SPRING_DATASOURCE_URL='${{ secrets.DB_URL }}' \
               -e SPRING_DATASOURCE_USERNAME='${{ secrets.DB_USERNAME }}' \
               -e SPRING_DATASOURCE_PASSWORD='${{ secrets.DB_PASSWORD }}' \
-              -e jwt.secret='${{ secrets.JWT_SECRET }}' \
-              -e jwt.expiration='${{ secrets.JWT_EXPIRATION }}' \
               ${{ secrets.DOCKER_USERNAME }}/arto-be:latest
