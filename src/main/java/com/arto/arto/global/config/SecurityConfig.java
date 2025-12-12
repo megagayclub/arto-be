@@ -26,6 +26,8 @@ import java.util.Arrays; // 👈 4. 추가
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+
+
     private final JwtTokenProvider jwtTokenProvider;
 
     // ==========================================================
@@ -80,6 +82,7 @@ public class SecurityConfig {
                                 "/api/v1/users/signup",
                                 "/api/v1/users/reset-password-request",
                                 "/api/v1/users/reset-password",
+                                "/health",  //test
                                 "/error"
                         ).permitAll()
                         .requestMatchers(
@@ -100,10 +103,14 @@ public class SecurityConfig {
 
                         // 4. 나머지는 로그인만 하면 됨 (내 정보 수정, 탈퇴 등)
                         .anyRequest().authenticated()
+
+
                 )
 
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
 }
