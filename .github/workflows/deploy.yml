@@ -59,9 +59,11 @@ jobs:
             # 3. 최신 이미지 다운로드
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/arto-be:latest
             
-            # 4. 앱 실행 (환경변수 -e 로 DB 비밀정보 주입!)
+            # 앱 실행
+            # 주의: jwt.secret이라는 이름으로 정확히 전달합니다.
             sudo docker run -d --name arto-server -p 8080:8080 \
               -e SPRING_DATASOURCE_URL='${{ secrets.DB_URL }}' \
               -e SPRING_DATASOURCE_USERNAME='${{ secrets.DB_USERNAME }}' \
               -e SPRING_DATASOURCE_PASSWORD='${{ secrets.DB_PASSWORD }}' \
+              -e jwt.secret='${{ secrets.JWT_SECRET }}' \
               ${{ secrets.DOCKER_USERNAME }}/arto-be:latest
