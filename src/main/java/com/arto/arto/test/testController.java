@@ -7,6 +7,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class testController {
     @GetMapping("/health")
     public String healthCheck() {
-        return "Arto Server is Running! (v1)";
+        return "Let's Go";
     }
 }
