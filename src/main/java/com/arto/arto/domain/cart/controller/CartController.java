@@ -5,36 +5,38 @@ import com.arto.arto.domain.cart.dto.response.CartResponse;
 import com.arto.arto.domain.cart.service.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/cart")
+@RequestMapping("/api/v1/cart") // ✅ 변경: /api/cart -> /api/v1/cart
 public class CartController {
 
     private final CartService cartService;
 
-    // 장바구니 조회
-    @GetMapping("/{userId}")
-    public CartResponse getCart(@PathVariable Long userId) {
-        return cartService.getCart(userId);
+    // ✅ 변경: userId PathVariable 제거, JWT 기반으로 내 장바구니 조회
+    @GetMapping
+    public CartResponse getMyCart(@AuthenticationPrincipal UserDetails userDetails) {
+        return cartService.getMyCart(userDetails.getUsername()); // username = email
     }
 
-    // 장바구니에 아이템 추가
-    @PostMapping("/{userId}/items")
+    // ✅ 변경: userId PathVariable 제거, JWT 기반으로 내 장바구니에 아이템 추가
+    @PostMapping("/items")
     public CartResponse addItem(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody CartItemAddRequest request
     ) {
-        return cartService.addItem(userId, request);
+        return cartService.addItemToMyCart(userDetails.getUsername(), request);
     }
 
-    // 장바구니 아이템 삭제
-    @DeleteMapping("/{userId}/items/{cartItemId}")
+    // ✅ 변경: userId PathVariable 제거, JWT 기반으로 내 장바구니 아이템 삭제
+    @DeleteMapping("/items/{cartItemId}")
     public CartResponse removeItem(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long cartItemId
     ) {
-        return cartService.removeItem(userId, cartItemId);
+        return cartService.removeItemFromMyCart(userDetails.getUsername(), cartItemId);
     }
 }
