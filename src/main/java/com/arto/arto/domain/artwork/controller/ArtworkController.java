@@ -63,4 +63,14 @@ public class ArtworkController {
 
         return ResponseEntity.ok(response);
     }
+
+    // 작품 삭제 API [DELETE] /api/v1/artworks/{artworkId}
+    @DeleteMapping("/{artworkId}")
+    public ResponseEntity<Map<String, String>> deleteArtwork(@PathVariable("artworkId") Long artworkId) {
+        artworkService.deleteArtwork(artworkId);
+
+        return ResponseEntity.ok(Map.of(
+                "message", "작품과 이미지가 성공적으로 삭제되었습니다."
+        ));
+    }
 }

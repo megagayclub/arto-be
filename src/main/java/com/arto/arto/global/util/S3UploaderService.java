@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import org.springframework.beans.factory.annotation.Value; // @Value 사용을 위해 추가
@@ -65,6 +66,25 @@ public class S3UploaderService {
             // S3 통신 중 발생한 AWS 예외
             // TODO: CustomException 처리 로직 추가
             throw new RuntimeException("S3 업로드 중 AWS 오류가 발생했습니다.", e);
+        }
+    }
+
+    public void deleteFile(String fileUrl) {
+        try {
+            // fileUrl 예시: https://bucket-name.s3.region.amazonaws.com/artworks/uuid-name.jpg
+            // 여기서 "artworks/uuid-name.jpg" 부분(Key)만 추출해야 합니다.
+            String key = fileUrl.substring(fileUrl.lastIndexOf("artworks/"));
+
+            DeleteObjectRequest deleteObjectRequest = DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(key)
+                    .build();
+
+            s3Client.deleteObject(deleteObjectRequest);
+            System.out.println("S3 파일 삭제 성공: " + key);
+        } catch (Exception e) {
+            System.err.println("S3 파일 삭제 실패: " + e.getMessage());
+            // 삭제 실패 시 로그만 남기거나 예외 처리를 합니다.
         }
     }
 }

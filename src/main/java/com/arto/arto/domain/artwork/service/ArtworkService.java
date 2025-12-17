@@ -83,4 +83,17 @@ public class ArtworkService {
                 .map(ArtworkSimpleResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteArtwork(Long artworkId) {
+        // 1. Artwork 대신 ArtworkEntity로 타입 변경
+        ArtworkEntity artwork = artworkRepository.findById(artworkId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 작품이 없습니다. id=" + artworkId));
+
+        // 2. S3에서 이미지 파일 삭제 (엔티티 안의 필드명이 thumbnailImageUrl인지 꼭 확인하세요!)
+        s3UploaderService.deleteFile(artwork.getThumbnailImageUrl());
+
+        // 3. DB에서 작품 데이터 삭제
+        artworkRepository.delete(artwork);
+    }
 }
