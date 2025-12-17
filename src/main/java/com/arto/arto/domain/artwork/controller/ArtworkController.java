@@ -4,8 +4,12 @@ import com.arto.arto.domain.artwork.dto.request.ArtworkCreateRequestDto;
 import com.arto.arto.domain.artwork.dto.response.ArtworkDetailResponseDto;
 import com.arto.arto.domain.artwork.service.ArtworkService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import com.arto.arto.domain.artwork.dto.request.ArtworkSearchCondition;
 import com.arto.arto.domain.artwork.dto.response.ArtworkSimpleResponseDto;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.Map;
 
@@ -25,15 +31,17 @@ public class ArtworkController {
 
 
     //작품 등록 API [POST] /api/v1/artworks
-    @PostMapping
+    @PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<Map<String, Object>> createArtwork(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody @Valid ArtworkCreateRequestDto requestDto) {
+            @RequestPart("dto") @Valid ArtworkCreateRequestDto requestDto,
+            @RequestPart("file") MultipartFile file) { // 단일 파일 업로드 추가
 
-        Long artworkId = artworkService.createArtwork(userDetails.getUsername(), requestDto);
+        // Service에 파일 전달 (Service 로직도 수정이 필요합니다)
+        Long artworkId = artworkService.createArtwork(userDetails.getUsername(), requestDto, file);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-                "message", "作品が正常に登録されました。", //작품이 정상적으로 등록되었습니다.
+                "message", "作品が正常に登録されました。",//작품이 정상적으로 등록되었습니다.
                 "artworkId", artworkId
         ));
     }
