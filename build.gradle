@@ -98,7 +98,7 @@ tasks.named('test') {
 }
 
 // 1. QueryDSL 설정용 변수
-def querydslDir = "$buildDir/generated/querydsl"
+def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
 
 // 2. 소스 세트 설정 (Gradle에게 "여기도 내 코드야"라고 알려줌)
 sourceSets {

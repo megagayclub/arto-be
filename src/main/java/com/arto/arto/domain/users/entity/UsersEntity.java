@@ -32,7 +32,8 @@ public class UsersEntity {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
-    @Column(name = "address", length = 500)
+
+    @Column(nullable = false, name = "address", length = 500)
     private String address;
 
     @Enumerated(EnumType.STRING)

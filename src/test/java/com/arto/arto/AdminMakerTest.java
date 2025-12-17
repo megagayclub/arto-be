@@ -39,6 +39,7 @@ public class AdminMakerTest {
                             .password(passwordEncoder.encode("Password123!"))
                             .name("슈퍼관리자")
                             .role(Role.ADMIN)
+                            .address("승환나라 승환시 승환로 승환길")
                             .isActive(true)
                             .build();
                     return usersRepository.save(newUser);
