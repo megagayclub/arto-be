@@ -3,10 +3,12 @@ package com.arto.arto.domain.orders.controller;
 import com.arto.arto.domain.orders.dto.request.OrderCheckoutRequest;
 import com.arto.arto.domain.orders.dto.request.OrderCreateRequest;
 import com.arto.arto.domain.orders.dto.request.ShippingInfoUpdateRequest;
+import com.arto.arto.domain.orders.dto.response.OrderHistoryResponse;
 import com.arto.arto.domain.orders.dto.response.OrderResponse;
 import com.arto.arto.domain.orders.service.OrdersService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,5 +60,12 @@ public class OrdersController {
     @PatchMapping("/{orderId}/complete")
     public OrderResponse completeDelivery(@PathVariable Long orderId) {
         return ordersService.completeDelivery(orderId);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<OrderHistoryResponse>> getMyOrders() {
+        // 위에서 선언한 변수명인 ordersService (s 포함)로 호출해야 합니다!
+        Long currentUserId = 1L;
+        return ResponseEntity.ok(ordersService.getMyOrderHistory(currentUserId));
     }
 }
