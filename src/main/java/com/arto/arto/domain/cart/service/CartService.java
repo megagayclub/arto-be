@@ -30,7 +30,44 @@ public class CartService {
     private final UsersRepository usersRepository;
     private final ArtworkRepository artworkRepository;
 
-    // 장바구니 조회
+    // =========================================================
+    // ✅ [추가] JWT 기반 API용 래퍼 메서드들 (email -> userId 변환)
+    // =========================================================
+
+    /**
+     * ✅ 추가: 토큰(=email) 기반으로 내 장바구니 조회
+     * 프론트: GET /api/v1/cart
+     */
+    public CartResponse getMyCart(String email) {
+        Long userId = getUserIdByEmail(email); // ✅ 추가
+        return getCart(userId);                // ✅ 기존 로직 재사용
+    }
+
+    /**
+     * ✅ 추가: 토큰(=email) 기반으로 내 장바구니에 아이템 추가
+     * 프론트: POST /api/v1/cart/items
+     */
+    @Transactional
+    public CartResponse addItemToMyCart(String email, CartItemAddRequest request) {
+        Long userId = getUserIdByEmail(email); // ✅ 추가
+        return addItem(userId, request);       // ✅ 기존 로직 재사용
+    }
+
+    /**
+     * ✅ 추가: 토큰(=email) 기반으로 내 장바구니에서 아이템 삭제
+     * 프론트: DELETE /api/v1/cart/items/{cartItemId}
+     */
+    @Transactional
+    public CartResponse removeItemFromMyCart(String email, Long cartItemId) {
+        Long userId = getUserIdByEmail(email); // ✅ 추가
+        return removeItem(userId, cartItemId); // ✅ 기존 로직 재사용
+    }
+
+    // =========================================================
+    // ✅ 기존 로직들 (userId 기반) - 최대한 유지
+    // =========================================================
+
+    // 장바구니 조회 (기존)
     public CartResponse getCart(Long userId) {
         UsersEntity user = getUser(userId);
 
@@ -64,7 +101,7 @@ public class CartService {
                 .build();
     }
 
-    // 장바구니에 아이템 추가
+    // 장바구니에 아이템 추가 (기존)
     @Transactional
     public CartResponse addItem(Long userId, CartItemAddRequest request) {
         UsersEntity user = getUser(userId);
@@ -90,7 +127,7 @@ public class CartService {
         return getCart(userId);
     }
 
-    // 장바구니에서 아이템 삭제
+    // 장바구니에서 아이템 삭제 (기존)
     @Transactional
     public CartResponse removeItem(Long userId, Long cartItemId) {
         CartItemsEntity item = cartItemsRepository.findById(cartItemId)
@@ -99,12 +136,16 @@ public class CartService {
                         "장바구니 항목을 찾을 수 없습니다."
                 ));
 
+        // ✅ 권한 체크(선택): 내 장바구니 아이템인지 검증하고 싶으면 여기서 추가 가능
         cartItemsRepository.delete(item);
 
         return getCart(userId);
     }
 
-    // 유틸 메서드들
+    // =========================================================
+    // ✅ 유틸 메서드들
+    // =========================================================
+
     private UsersEntity getUser(Long userId) {
         return usersRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(
@@ -119,5 +160,17 @@ public class CartService {
                         HttpStatus.NOT_FOUND.value(),
                         "작품을 찾을 수 없습니다."
                 ));
+    }
+
+    /**
+     * ✅ 추가: 이메일로 userId 찾기 (JWT 기반용 핵심)
+     */
+    private Long getUserIdByEmail(String email) {
+        UsersEntity user = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "사용자를 찾을 수 없습니다."
+                ));
+        return user.getUserId();
     }
 }
