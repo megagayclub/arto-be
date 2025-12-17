@@ -24,6 +24,16 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement {
+	imports {
+		// Spring Cloud AWS BOM: Starter S3의 버전을 관리합니다. (3.1.1은 Spring Boot 3.x 버전과 호환됩니다.)
+		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"
+
+		// AWS SDK v2 BOM: software.amazon.awssdk:s3의 버전을 관리합니다.
+		mavenBom "software.amazon.awssdk:bom:2.25.10"
+	}
+}
+
 dependencies {
 	// Spring Boot 기본 스타터
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -69,6 +79,10 @@ dependencies {
 
 	//email인증 디펜더시
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+	//S3
+	implementation 'software.amazon.awssdk:s3' // S3 기능만 포함
+	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
 }
 
 tasks.withType(JavaCompile) {

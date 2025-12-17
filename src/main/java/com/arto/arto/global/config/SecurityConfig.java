@@ -108,6 +108,7 @@ public class SecurityConfig {
                         // 3. 작품 관리
                         .requestMatchers(HttpMethod.POST, "/api/v1/artworks").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/artworks/**").hasRole("ADMIN")
+                        .requestMatchers("/api/orders/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/artworks/**").hasRole("ADMIN")
 
 

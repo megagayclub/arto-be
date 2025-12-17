@@ -17,6 +17,8 @@ public class WishlistsController {
 
     private final WishlistsService wishlistsService;
 
+
+    //찜하기
     @PostMapping("/{artworkId}")
     public ResponseEntity<Map<String, Object>> toggleWishlist(
             @AuthenticationPrincipal UserDetails userDetails,

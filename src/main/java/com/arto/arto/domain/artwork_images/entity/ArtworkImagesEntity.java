@@ -3,9 +3,18 @@ package com.arto.arto.domain.artwork_images.entity;
 import com.arto.arto.domain.artwork.entity.ArtworkEntity;
 import com.arto.arto.domain.artwork_images.type.ImageType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "tbl_artwork_images")
 public class ArtworkImagesEntity {
     @Id

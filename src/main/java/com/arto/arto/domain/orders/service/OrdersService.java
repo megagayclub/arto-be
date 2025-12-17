@@ -7,6 +7,7 @@ import com.arto.arto.domain.cart_items.repository.CartItemsRepository;
 import com.arto.arto.domain.orders.dto.request.OrderCheckoutRequest;
 import com.arto.arto.domain.orders.dto.request.OrderCreateRequest;
 import com.arto.arto.domain.orders.dto.request.ShippingInfoUpdateRequest;
+import com.arto.arto.domain.orders.dto.response.OrderHistoryResponse;
 import com.arto.arto.domain.orders.dto.response.OrderResponse;
 import com.arto.arto.domain.orders.entity.OrdersEntity;
 import com.arto.arto.domain.orders.repository.OrdersRepository;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -189,6 +191,24 @@ public class OrdersService {
 
         OrdersEntity saved = ordersRepository.save(order);
         return OrderResponse.fromEntity(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<OrderHistoryResponse> getMyOrderHistory(Long userId) {
+
+        List<OrdersEntity> orders = ordersRepository.findByBuyerIdOrderByOrderDateDesc(userId);
+
+        return orders.stream()
+                .map(order -> OrderHistoryResponse.builder()
+                        .orderId(order.getId())
+                        .artworkTitle(order.getArtwork() != null ? order.getArtwork().getTitle() : "정보 없음")
+                        .artistName(order.getArtwork() != null ? order.getArtwork().getArtistName() : "작가 미상")
+                        .thumbnailUrl(order.getArtwork() != null ? order.getArtwork().getThumbnailImageUrl() : null)
+                        .totalAmount(order.getTotalAmount())
+                        .orderDate(order.getOrderDate())
+                        .orderStatus(order.getOrderStatus() != null ? order.getOrderStatus().name() : null)
+                        .build())
+                .collect(Collectors.toList());
     }
 
 }
