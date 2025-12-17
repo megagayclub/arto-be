@@ -3,6 +3,7 @@ package com.arto.arto.domain.artwork.repository;
 import com.arto.arto.domain.artwork.dto.request.ArtworkSearchCondition;
 import com.arto.arto.domain.artwork.entity.ArtworkEntity;
 import com.arto.arto.domain.artwork.type.Morph;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class ArtworkRepositoryImpl implements ArtworkRepositoryCustom {
                         shippingMethodsIn(condition.getShippingMethods()),
                         excludeSoldOut(condition.getExcludeSoldOut())
                 )
-                .orderBy(artworkEntity.createdAt.desc()) // 최신순 정렬
+                .orderBy(getSortOrder(condition.getSort())) // 정렬 조건 적용
                 .fetch();
     }
 
@@ -92,5 +93,17 @@ public class ArtworkRepositoryImpl implements ArtworkRepositoryCustom {
         // excludeSoldOut이 true이면 -> status가 'SOLD_OUT'이 아닌 것만 가져와라
         return (excludeSoldOut != null && excludeSoldOut) ?
                 artworkEntity.status.ne(com.arto.arto.domain.artwork.type.ArtworkStatus.SOLD_OUT) : null;
+    }
+
+    private OrderSpecifier<?> getSortOrder(String sort) {
+        if (sort == null) {
+            return artworkEntity.createdAt.desc(); // 기본값: 최신순
+        }
+
+        return switch (sort) {
+            case "PRICE_ASC" -> artworkEntity.price.asc();    // 가격 낮은 순
+            case "PRICE_DESC" -> artworkEntity.price.desc();  // 가격 높은 순
+            default -> artworkEntity.createdAt.desc();        // 그 외엔 최신순
+        };
     }
 }

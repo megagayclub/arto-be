@@ -31,4 +31,7 @@ public class ArtworkSearchCondition {
 
     //품절 제외 여부 (체크하면 true)
     private Boolean excludeSoldOut;
+
+    // "PRICE_ASC" (싼순), "PRICE_DESC" (비싼순), "LATEST" (최신순)
+    private String sort;
 }
