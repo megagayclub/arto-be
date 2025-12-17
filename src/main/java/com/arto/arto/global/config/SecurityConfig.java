@@ -38,7 +38,14 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // 5173 포트를 가진 모든 로컬호스트를 허용합니다. (필요시 다른 포트 추가)
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://127.0.0.1:5173", "http://52.79.193.77"));
+        configuration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173",
+                "http://52.79.193.77",
+                "http://52.79.193.77:81"
+
+        ));
+
 
 
 
