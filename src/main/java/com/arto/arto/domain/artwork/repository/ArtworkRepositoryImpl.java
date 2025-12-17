@@ -19,6 +19,7 @@ public class ArtworkRepositoryImpl implements ArtworkRepositoryCustom {
 
     @Override
     public List<ArtworkEntity> search(ArtworkSearchCondition condition) {
+        System.out.println("검색 키워드 확인: " + condition.getKeyword());
         return queryFactory
                 .selectFrom(artworkEntity)
                 .where(
@@ -43,8 +44,8 @@ public class ArtworkRepositoryImpl implements ArtworkRepositoryCustom {
     // 1. 검색어 (제목 or 작가 이름 포함)
     private BooleanExpression keywordContains(String keyword) {
         return keyword != null ?
-                artworkEntity.title.contains(keyword)
-                        .or(artworkEntity.artistName.contains(keyword)) : null;
+                artworkEntity.title.contains(keyword) // 제목에 포함되거나
+                        .or(artworkEntity.artistName.contains(keyword)) : null; // 작가 이름에 포함되면 OK
     }
 
     // 2. 가격 (최소 가격 이상)
@@ -62,23 +63,22 @@ public class ArtworkRepositoryImpl implements ArtworkRepositoryCustom {
         return morph != null ? artworkEntity.morph.eq(morph) : null;
     }
 
-    // 5. 색상 필터 (태그 목록 중 하나라도 포함되면 OK)
-    private BooleanExpression colorsIn(List<String> colors) {
-        // artwork.colors 안에 있는 이름 중 하나라도 목록에 있으면 통과
+    // 5. 색상 필터
+    private BooleanExpression colorsIn(List<Long> colors) { // String -> Long
         return (colors != null && !colors.isEmpty()) ?
-                artworkEntity.colors.any().name.in(colors) : null;
+                artworkEntity.colors.any().id.in(colors) : null; // name -> id
     }
 
     // 6. 공간 필터
-    private BooleanExpression spacesIn(List<String> spaces) {
+    private BooleanExpression spacesIn(List<Long> spaces) { // String -> Long
         return (spaces != null && !spaces.isEmpty()) ?
-                artworkEntity.spaces.any().name.in(spaces) : null;
+                artworkEntity.spaces.any().id.in(spaces) : null; // name -> id
     }
 
     // 7. 분위기 필터
-    private BooleanExpression moodsIn(List<String> moods) {
+    private BooleanExpression moodsIn(List<Long> moods) { // String -> Long
         return (moods != null && !moods.isEmpty()) ?
-                artworkEntity.moods.any().name.in(moods) : null;
+                artworkEntity.moods.any().id.in(moods) : null; // name -> id
     }
 
     // 8. 배송 방법 필터 (무료배송, 착불 등)

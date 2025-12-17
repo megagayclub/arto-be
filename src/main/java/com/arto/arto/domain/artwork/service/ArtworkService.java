@@ -5,6 +5,7 @@ import com.arto.arto.domain.artwork.dto.response.ArtworkDetailResponseDto;
 import com.arto.arto.domain.artwork.entity.*;
 import com.arto.arto.domain.artwork.repository.*;
 import com.arto.arto.domain.artwork.type.ArtworkStatus;
+import com.arto.arto.domain.artwork.type.Morph;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import com.arto.arto.domain.users.repository.UsersRepository;
 import com.arto.arto.global.util.S3UploaderService;
@@ -13,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.arto.arto.domain.artwork.dto.request.ArtworkSearchCondition;
 import com.arto.arto.domain.artwork.dto.response.ArtworkSimpleResponseDto;
+
+import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -95,5 +99,33 @@ public class ArtworkService {
 
         // 3. DB에서 작품 데이터 삭제
         artworkRepository.delete(artwork);
+    }
+
+    // ArtworkService.java 내부에 추가 예시
+    @Transactional(readOnly = true)
+    public Map<String, Object> getAllFilters() {
+        // Map.of 앞에 <String, Object>를 붙여주세요.
+        List<Map<String, Object>> spaces = spaceRepository.findAll().stream()
+                .map(s -> Map.<String, Object>of("id", s.getId(), "name", s.getName()))
+                .toList();
+
+        List<Map<String, Object>> moods = moodRepository.findAll().stream()
+                .map(m -> Map.<String, Object>of("id", m.getId(), "name", m.getName()))
+                .toList();
+
+        List<Map<String, Object>> colors = colorRepository.findAll().stream()
+                .map(c -> Map.<String, Object>of("id", c.getId(), "name", c.getName()))
+                .toList();
+
+        List<String> shapes = Arrays.stream(Morph.values())
+                .map(Enum::name)
+                .toList();
+
+        return Map.of(
+                "spaces", spaces,
+                "moods", moods,
+                "colors", colors,
+                "shapes", shapes
+        );
     }
 }

@@ -32,6 +32,8 @@ public class QArtworkEntity extends EntityPathBase<ArtworkEntity> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
+    public final ListPath<com.arto.arto.domain.artwork_images.entity.ArtworkImagesEntity, com.arto.arto.domain.artwork_images.entity.QArtworkImagesEntity> images = this.<com.arto.arto.domain.artwork_images.entity.ArtworkImagesEntity, com.arto.arto.domain.artwork_images.entity.QArtworkImagesEntity>createList("images", com.arto.arto.domain.artwork_images.entity.ArtworkImagesEntity.class, com.arto.arto.domain.artwork_images.entity.QArtworkImagesEntity.class, PathInits.DIRECT2);
+
     public final SetPath<MoodEntity, QMoodEntity> moods = this.<MoodEntity, QMoodEntity>createSet("moods", MoodEntity.class, QMoodEntity.class, PathInits.DIRECT2);
 
     public final EnumPath<com.arto.arto.domain.artwork.type.Morph> morph = createEnum("morph", com.arto.arto.domain.artwork.type.Morph.class);

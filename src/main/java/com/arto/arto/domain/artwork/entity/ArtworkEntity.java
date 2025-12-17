@@ -3,6 +3,7 @@ package com.arto.arto.domain.artwork.entity;
 import com.arto.arto.domain.artwork.type.ArtworkStatus;
 import com.arto.arto.domain.artwork.type.Morph;
 import com.arto.arto.domain.artwork.type.ShippingMethod;
+import com.arto.arto.domain.artwork_images.entity.ArtworkImagesEntity;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,6 +76,9 @@ public class ArtworkEntity {
 
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "artwork", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ArtworkImagesEntity> images = new ArrayList<>();
 
     //태그 정보 연결 (색상, 공간, 분위기)
     @ManyToMany
