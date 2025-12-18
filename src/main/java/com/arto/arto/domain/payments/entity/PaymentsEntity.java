@@ -4,11 +4,16 @@ import com.arto.arto.domain.orders.entity.OrdersEntity;
 import com.arto.arto.domain.payments.type.PaymentMethod;
 import com.arto.arto.domain.payments.type.PaymentStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tbl_payments")
+@Getter
+@Setter
 public class PaymentsEntity {
 
     @Id
@@ -35,5 +40,6 @@ public class PaymentsEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_status", nullable = false)
     private PaymentStatus paymentStatus;
+
 
 }

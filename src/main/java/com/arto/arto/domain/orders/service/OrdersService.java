@@ -12,6 +12,8 @@ import com.arto.arto.domain.orders.dto.response.OrderResponse;
 import com.arto.arto.domain.orders.entity.OrdersEntity;
 import com.arto.arto.domain.orders.repository.OrdersRepository;
 import com.arto.arto.domain.orders.type.OrderStatus;
+import com.arto.arto.domain.payments.entity.PaymentsEntity;
+import com.arto.arto.domain.payments.repository.PaymentsRepository;
 import com.arto.arto.domain.shopping_carts.entity.ShoppingCartsEntity;
 import com.arto.arto.domain.shopping_carts.repository.ShoppingCartsRepository;
 import com.arto.arto.domain.users.entity.UsersEntity;
@@ -37,6 +39,8 @@ public class OrdersService {
     private final ShoppingCartsRepository shoppingCartsRepository;
     private final CartItemsRepository cartItemsRepository;
     private final ArtworkRepository artworkRepository;
+
+    private final PaymentsRepository paymentsRepository; // ✅ 추가
 
     // 주문 생성
     @Transactional
@@ -193,21 +197,34 @@ public class OrdersService {
         return OrderResponse.fromEntity(saved);
     }
 
+    // ✅ 내 주문(구매) 이력 + 결제 정보까지 포함해서 반환
     @Transactional(readOnly = true)
     public List<OrderHistoryResponse> getMyOrderHistory(Long userId) {
 
         List<OrdersEntity> orders = ordersRepository.findByBuyerIdOrderByOrderDateDesc(userId);
 
         return orders.stream()
-                .map(order -> OrderHistoryResponse.builder()
-                        .orderId(order.getId())
-                        .artworkTitle(order.getArtwork() != null ? order.getArtwork().getTitle() : "정보 없음")
-                        .artistName(order.getArtwork() != null ? order.getArtwork().getArtistName() : "작가 미상")
-                        .thumbnailUrl(order.getArtwork() != null ? order.getArtwork().getThumbnailImageUrl() : null)
-                        .totalAmount(order.getTotalAmount())
-                        .orderDate(order.getOrderDate())
-                        .orderStatus(order.getOrderStatus() != null ? order.getOrderStatus().name() : null)
-                        .build())
+                .map(order -> {
+                    // ✅ 결제 정보가 없을 수도 있음 (주문만 있고 결제 생성 전)
+                    PaymentsEntity payment = paymentsRepository.findByOrder_Id(order.getId()).orElse(null);
+
+                    return OrderHistoryResponse.builder()
+                            .orderId(order.getId())
+                            .artworkTitle(order.getArtwork() != null ? order.getArtwork().getTitle() : "정보 없음")
+                            .artistName(order.getArtwork() != null ? order.getArtwork().getArtistName() : "작가 미상")
+                            .thumbnailUrl(order.getArtwork() != null ? order.getArtwork().getThumbnailImageUrl() : null)
+                            .totalAmount(order.getTotalAmount())
+                            .orderDate(order.getOrderDate())
+                            .orderStatus(order.getOrderStatus() != null ? order.getOrderStatus().name() : null)
+
+                            // ✅ 결제 필드 채우기 (없으면 null)
+                            .paymentId(payment != null ? payment.getPaymentId() : null)
+                            .paymentStatus(payment != null && payment.getPaymentStatus() != null ? payment.getPaymentStatus().name() : null)
+                            .paymentMethod(payment != null && payment.getPaymentMethod() != null ? payment.getPaymentMethod().name() : null)
+                            .paymentDate(payment != null ? payment.getPaymentDate() : null)
+                            .transactionId(payment != null ? payment.getTransactionId() : null)
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

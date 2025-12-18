@@ -111,7 +111,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/orders/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/artworks/**").hasRole("ADMIN")
 
-
+                        // 결제 관리
+                        .requestMatchers("/api/payments/**").hasAnyRole("USER", "ADMIN")
                         // 4. 나머지는 로그인만 하면 됨 (내 정보 수정, 탈퇴 등)
                         .anyRequest().authenticated()
 

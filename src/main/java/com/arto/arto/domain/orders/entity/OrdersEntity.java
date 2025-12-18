@@ -61,4 +61,6 @@ public class OrdersEntity {
 
     @Column(name = "tracking_number")   // 운송장 번호
     private String trackingNumber;
+
+
 }
