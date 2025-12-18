@@ -36,6 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 src/main/resources/application.yaml
-src/test/resources/application-test.yml
 
-/src/main/generated
+# .gitignore 파일에 추가
+/build/
+/out/
+src/main/generated/
+
