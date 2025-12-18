@@ -7,6 +7,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import com.arto.arto.domain.wishlists.dto.response.WishlistResponseDto;
+
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,16 @@ public class WishlistsController {
                 "isAdded", isAdded
         ));
     }
+
+    @DeleteMapping("/{artworkId}")
+    public ResponseEntity<String> deleteWishlist(
+            Principal principal,
+            @PathVariable("artworkId") Long artworkId // ("artworkId")를 추가하세요!
+    ) {
+        wishlistsService.deleteWishlist(principal.getName(), artworkId);
+        return ResponseEntity.ok("찜이 취소되었습니다.");
+    }
+
 
     @GetMapping
     public ResponseEntity<List<WishlistResponseDto>> getMyWishlists(
