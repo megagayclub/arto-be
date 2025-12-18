@@ -1,5 +1,7 @@
 package com.arto.arto.domain.payments.controller;
 
+import com.arto.arto.domain.payments.dto.request.PaymentConfirmRequest;
+import com.arto.arto.domain.payments.dto.request.PaymentReadyRequest;
 import com.arto.arto.domain.payments.service.PaymentsService;
 import com.arto.arto.domain.payments.type.PaymentMethod;
 import jakarta.validation.constraints.NotNull;
@@ -41,25 +43,4 @@ public class PaymentsController {
         return paymentsService.getPaymentByOrderId(orderId);
     }
 
-    // =========================
-    // 내부 Request DTO
-    // (원하면 dto/request 패키지로 분리해도 됨)
-    // =========================
-
-    @Getter
-    public static class PaymentReadyRequest {
-        @NotNull
-        private Long orderId;
-
-        @NotNull
-        private PaymentMethod paymentMethod;
-    }
-
-    @Getter
-    public static class PaymentConfirmRequest {
-        @NotNull
-        private Long paymentId;
-
-        private String transactionId; // 지금은 선택, PG 붙으면 사용
-    }
 }
