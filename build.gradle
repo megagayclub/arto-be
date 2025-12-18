@@ -6,7 +6,6 @@ plugins {
 
 group = 'com.arto'
 version = '0.0.1-SNAPSHOT'
-description = 'arto project for Spring Boot'
 
 java {
 	toolchain {
@@ -44,7 +43,7 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// ✅ QueryDSL (Jakarta 패키지 설정)
+	// ✅ QueryDSL (Jakarta 패키지 설정 - 3.x 필수)
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
@@ -70,6 +69,7 @@ dependencies {
 }
 
 // ✅ QueryDSL 빌드 설정 (Spring Boot 3.x 최적화)
+// build/generated/querydsl 경로를 명확히 지정합니다.
 def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
 
 tasks.withType(JavaCompile) {
