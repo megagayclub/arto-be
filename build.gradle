@@ -26,98 +26,63 @@ repositories {
 
 dependencyManagement {
 	imports {
-		// Spring Cloud AWS BOM: Starter S3의 버전을 관리합니다. (3.1.1은 Spring Boot 3.x 버전과 호환됩니다.)
 		mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:3.1.1"
-
-		// AWS SDK v2 BOM: software.amazon.awssdk:s3의 버전을 관리합니다.
 		mavenBom "software.amazon.awssdk:bom:2.25.10"
 	}
 }
 
 dependencies {
-	// Spring Boot 기본 스타터
+	// Spring Boot Starters
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
-
-	// ✅ JWT (토큰 기반 인증)
+	// ✅ JWT
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	// ✅ QueryDSL (타입 안전 쿼리)
+	// ✅ QueryDSL (Jakarta 패키지 설정)
 	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
 	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
 	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
-	// ✅ Lombok (코드 간결화)
+	// ✅ Lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// ✅ 개발용 자동 리로드
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
-	// ✅ DB 드라이버 (PostgreSQL 유지)
-	runtimeOnly 'org.postgresql:postgresql'
-
-	// ✅ 테스트용
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-
-	//spring security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'	//타임리프에서 스프링 시큐리티를 사용하기 위한 의존성
-	testImplementation 'org.springframework.security:spring-security-test'	//스프링 시큐리티를 테스트하기위한 의존성
-
-	// QueryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
-	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
-	//email인증 디펜더시
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-	//S3
-	implementation 'software.amazon.awssdk:s3' // S3 기능만 포함
+	// AWS & S3
+	implementation 'software.amazon.awssdk:s3'
 	implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
+
+	// DB & Utils
+	runtimeOnly 'org.postgresql:postgresql'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+	// Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
-tasks.withType(JavaCompile) {
-	options.compilerArgs.add("-parameters")
-}
+// ✅ QueryDSL 빌드 설정 (Spring Boot 3.x 최적화)
+def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
 
-tasks.withType(JavaCompile) {
-	options.compilerArgs.add("-parameters")
-}
-
-tasks.named('test') {
-	useJUnitPlatform()
-}
-
-// 1. QueryDSL 설정용 변수 (layout 대신 전통적인 buildDir 방식 사용)
-def querydslDir = "$buildDir/generated/querydsl"
-
-// 2. 컴파일 작업 설정
 tasks.withType(JavaCompile) {
 	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
+	options.compilerArgs << "-parameters"
 }
 
-// 3. 소스 세트 설정
 sourceSets {
 	main.java.srcDirs += [ querydslDir ]
 }
 
-// 4. clean 시 생성된 폴더 삭제
 clean {
-	delete file(querydslDir)
-}
-
-// 5. 컴파일 옵션 (중복 정의 제거 및 통합)
-tasks.withType(JavaCompile) {
-	options.compilerArgs << "-parameters"
+	delete querydslDir
 }
 
 tasks.named('test') {
