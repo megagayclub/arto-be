@@ -97,20 +97,29 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-// 1. QueryDSL 설정용 변수
-def querydslDir = layout.buildDirectory.dir("generated/querydsl").get().asFile
+// 1. QueryDSL 설정용 변수 (layout 대신 전통적인 buildDir 방식 사용)
+def querydslDir = "$buildDir/generated/querydsl"
 
-// 2. 소스 세트 설정 (Gradle에게 "여기도 내 코드야"라고 알려줌)
-sourceSets {
-	main.java.srcDirs += [ querydslDir ]
-}
-
-// 3. 컴파일 작업 설정 (자바 컴파일할 때 Q파일도 같이 만들어!)
+// 2. 컴파일 작업 설정
 tasks.withType(JavaCompile) {
 	options.getGeneratedSourceOutputDirectory().set(file(querydslDir))
 }
 
-// 4. 청소 작업 설정 (clean 명령 실행 시 Q파일도 지워!)
-clean.doLast {
-	file(querydslDir).deleteDir()
+// 3. 소스 세트 설정
+sourceSets {
+	main.java.srcDirs += [ querydslDir ]
+}
+
+// 4. clean 시 생성된 폴더 삭제
+clean {
+	delete file(querydslDir)
+}
+
+// 5. 컴파일 옵션 (중복 정의 제거 및 통합)
+tasks.withType(JavaCompile) {
+	options.compilerArgs << "-parameters"
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
 }

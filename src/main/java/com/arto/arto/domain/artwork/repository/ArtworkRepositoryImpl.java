@@ -11,7 +11,8 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static com.arto.arto.domain.artwork.entity.QArtworkEntity.artworkEntity; // Q파일 static import
+import static com.arto.arto.domain.artwork.entity.QArtworkEntity.artworkEntity;
+
 
 @RequiredArgsConstructor
 public class ArtworkRepositoryImpl implements ArtworkRepositoryCustom {
