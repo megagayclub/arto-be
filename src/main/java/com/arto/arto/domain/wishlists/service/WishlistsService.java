@@ -58,4 +58,20 @@ public class WishlistsService {
                 .map(WishlistResponseDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    // WishlistsService.java
+
+    @Transactional
+    public void deleteWishlist(String userEmail, Long artworkId) {
+        // 1. 이메일로 유저 엔티티 조회 [cite: 75, 173]
+        UsersEntity user = usersRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        // 2. ID로 작품 엔티티 조회 [cite: 18, 126, 219]
+        ArtworkEntity artwork = artworkRepository.findById(artworkId)
+                .orElseThrow(() -> new RuntimeException("작품을 찾을 수 없습니다."));
+
+        // 3. 레포지토리에 이미 만들어둔 삭제 메서드 호출!
+        wishlistsRepository.deleteByUserAndArtwork(user, artwork);
+    }
 }
