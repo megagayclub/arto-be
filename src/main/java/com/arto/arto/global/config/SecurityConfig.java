@@ -51,7 +51,7 @@ public class SecurityConfig {
 
 
         // Preflight 요청에 필요한 OPTIONS 포함, 필요한 모든 메서드를 허용합니다.
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*")); // 모든 헤더 허용
         configuration.setAllowCredentials(true); // 자격 증명(인증 토큰 등) 허용
         configuration.setMaxAge(3600L); // Preflight 캐시 시간 1시간

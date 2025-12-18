@@ -6,8 +6,11 @@ import com.arto.arto.domain.orders.dto.request.ShippingInfoUpdateRequest;
 import com.arto.arto.domain.orders.dto.response.OrderHistoryResponse;
 import com.arto.arto.domain.orders.dto.response.OrderResponse;
 import com.arto.arto.domain.orders.service.OrdersService;
+import com.arto.arto.domain.users.repository.UsersRepository;
+import com.arto.arto.global.exception.CustomException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +22,7 @@ import java.util.List;
 public class OrdersController {
 
     private final OrdersService ordersService;
+    private final UsersRepository usersRepository;
 
     // 🎯 단일 주문 생성 (바로 작품에서 주문할 때)
     @PostMapping
@@ -62,10 +66,19 @@ public class OrdersController {
         return ordersService.completeDelivery(orderId);
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<List<OrderHistoryResponse>> getMyOrders() {
-        // 위에서 선언한 변수명인 ordersService (s 포함)로 호출해야 합니다!
-        Long currentUserId = 1L;
+    @GetMapping("/my")
+    public ResponseEntity<List<OrderHistoryResponse>> getMyOrders(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails
+    ) {
+        String email = userDetails.getUsername();
+
+        Long currentUserId = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "사용자를 찾을 수 없습니다."
+                ))
+                .getUserId(); // UsersEntity 필드명이 userId니까 이거 맞음
+
         return ResponseEntity.ok(ordersService.getMyOrderHistory(currentUserId));
     }
 }
