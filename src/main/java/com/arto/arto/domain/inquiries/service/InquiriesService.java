@@ -9,12 +9,14 @@ import com.arto.arto.domain.inquiries.type.InquiryStatus;
 import com.arto.arto.domain.users.entity.UsersEntity;
 import com.arto.arto.domain.users.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.arto.arto.domain.inquiries.dto.response.InquiryResponseDto;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.time.LocalDateTime;
+import org.springframework.mail.javamail.JavaMailSender;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +25,7 @@ public class InquiriesService {
     private final InquiriesRepository inquiriesRepository;
     private final UsersRepository usersRepository;
     private final ArtworkRepository artworkRepository;
+    private final JavaMailSender mailSender;
 
     // 문의 등록
     @Transactional
@@ -48,8 +51,27 @@ public class InquiriesService {
                 .status(InquiryStatus.PENDING)
                 .createdAt(LocalDateTime.now())
                 .build();
+        Long savedId = inquiriesRepository.save(inquiry).getInquiryId();
 
-        return inquiriesRepository.save(inquiry).getInquiryId();
+        sendAdminNotification(inquiry);
+
+
+        return savedId;
+    }
+
+
+    // 메일 발송 전용 메서드
+    private void sendAdminNotification(InquiriesEntity inquiry) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo("seunghwanj56@gmail.com"); // 관리자 수신 이메일
+        message.setSubject("[ARTO 신규 문의] " + inquiry.getTitle());
+        message.setText("새로운 고객 문의가 접수되었습니다.\n\n" +
+                "카테고리: " + inquiry.getCategory() + "\n" +
+                "작성자: " + inquiry.getSender().getName() + "(" + inquiry.getSender().getEmail() + ")\n" +
+                "내용: " + inquiry.getContent() + "\n" +
+                "문의 일시: " + inquiry.getCreatedAt());
+
+        mailSender.send(message);
     }
 
     @Transactional(readOnly = true)
