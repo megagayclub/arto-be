@@ -1,44 +1,27 @@
-HELP.md
-.gradle
+# 1. 빌드 결과물 (가장 중요)
 build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
 out/
-!**/src/main/**/out/
-!**/src/test/**/out/
+bin/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-### VS Code ###
-.vscode/
-src/main/resources/application.yaml
-
-# .gitignore 파일에 추가
-/build/
-/out/
+# 2. Querydsl / Generated 소스
 src/main/generated/
+/build/generated/
 
+# 3. IDE 관련
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+
+# 4. Gradle 및 기타
+.gradle/
+/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# 5. 설정 파일 (보안)
+src/main/resources/application.yaml
