@@ -30,13 +30,22 @@ public class OrdersController {
         return ordersService.createOrder(request);
     }
 
-    // 🎯 장바구니 → 주문 여러 개 생성
-    @PostMapping("/checkout/{userId}")
-    public List<OrderResponse> checkoutFromCart(
-            @PathVariable Long userId,
+    @PostMapping("/checkout")
+    public List<OrderResponse> checkoutFromCartMy(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal
+            org.springframework.security.core.userdetails.UserDetails userDetails,
             @Valid @RequestBody OrderCheckoutRequest request
     ) {
-        return ordersService.checkoutFromCart(userId, request);
+        String email = userDetails.getUsername();
+
+        Long currentUserId = usersRepository.findByEmail(email)
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.NOT_FOUND.value(),
+                        "사용자를 찾을 수 없습니다."
+                ))
+                .getUserId();
+
+        return ordersService.checkoutFromCart(currentUserId, request);
     }
 
     // 주문 상세 조회
