@@ -108,8 +108,9 @@ public class SecurityConfig {
                         // 3. 작품 관리
                         .requestMatchers(HttpMethod.POST, "/api/v1/artworks").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/v1/artworks/**").hasRole("ADMIN")
-                        .requestMatchers("/api/orders/**").permitAll()
+                        .requestMatchers("/api/v1/orders/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/artworks/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orders/checkout").authenticated()
 
                         // 결제 관리
                         .requestMatchers("/api/payments/**").hasAnyRole("USER", "ADMIN")
