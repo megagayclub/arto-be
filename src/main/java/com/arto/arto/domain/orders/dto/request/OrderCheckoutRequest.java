@@ -1,5 +1,6 @@
 package com.arto.arto.domain.orders.dto.request;
 
+import com.arto.arto.domain.payments.type.PaymentMethod;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,4 +23,9 @@ public class OrderCheckoutRequest {
 
     @NotBlank(message = "수령인 이름을 입력해주세요.")
     private String receiverName;
+
+    // ✅ 추가: 결제수단
+    // "CARD" | "BANK_TRANSFER" | "VIRTUAL_ACCOUNT"
+    @NotNull
+    private PaymentMethod paymentMethod;
 }

@@ -14,6 +14,9 @@ import com.arto.arto.domain.orders.repository.OrdersRepository;
 import com.arto.arto.domain.orders.type.OrderStatus;
 import com.arto.arto.domain.payments.entity.PaymentsEntity;
 import com.arto.arto.domain.payments.repository.PaymentsRepository;
+import com.arto.arto.domain.payments.service.PaymentsService;
+import com.arto.arto.domain.payments.type.PaymentMethod;
+import com.arto.arto.domain.payments.type.PaymentStatus;
 import com.arto.arto.domain.shopping_carts.entity.ShoppingCartsEntity;
 import com.arto.arto.domain.shopping_carts.repository.ShoppingCartsRepository;
 import com.arto.arto.domain.users.entity.UsersEntity;
@@ -24,6 +27,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.UUID;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +46,7 @@ public class OrdersService {
     private final ArtworkRepository artworkRepository;
 
     private final PaymentsRepository paymentsRepository; // ✅ 추가
+    private final PaymentsService paymentsService;
 
     // 주문 생성
     @Transactional
@@ -74,21 +80,18 @@ public class OrdersService {
     @Transactional
     public List<OrderResponse> checkoutFromCart(Long userId, OrderCheckoutRequest request) {
 
-        // 1. 유저 검증
         UsersEntity buyer = usersRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.NOT_FOUND.value(),
                         "사용자를 찾을 수 없습니다."
                 ));
 
-        // 2. 유저의 장바구니 조회
         ShoppingCartsEntity cart = shoppingCartsRepository.findByUser(buyer)
                 .orElseThrow(() -> new CustomException(
                         HttpStatus.BAD_REQUEST.value(),
                         "장바구니가 존재하지 않습니다."
                 ));
 
-        // 3. 장바구니 아이템 조회
         List<CartItemsEntity> cartItems = cartItemsRepository.findByCart(cart);
         if (cartItems.isEmpty()) {
             throw new CustomException(
@@ -97,9 +100,11 @@ public class OrdersService {
             );
         }
 
+        // ✅ 결제수단
+        PaymentMethod method = request.getPaymentMethod();
+
         List<OrderResponse> result = new ArrayList<>();
 
-        // 4. 각 CartItem → OrdersEntity 생성
         for (CartItemsEntity cartItem : cartItems) {
             ArtworkEntity artwork = cartItem.getArtwork();
 
@@ -108,17 +113,37 @@ public class OrdersService {
             order.setArtwork(artwork);
             order.setOrderDate(LocalDate.now());
             order.setTotalAmount(artwork.getPrice());
-            order.setOrderStatus(OrderStatus.PENDING); // 기본 상태
+            order.setOrderStatus(OrderStatus.PENDING);
+
             order.setPostCode(request.getPostCode());
             order.setShippingAddress(request.getShippingAddress());
             order.setShippingPhoneNumber(request.getShippingPhoneNumber());
             order.setReceiverName(request.getReceiverName());
 
-            OrdersEntity saved = ordersRepository.save(order);
-            result.add(OrderResponse.fromEntity(saved));
+            OrdersEntity savedOrder = ordersRepository.save(order);
+
+            // ===========================
+            // ✅ 결제 생성 + 즉시 확정 처리
+            // ===========================
+            PaymentsEntity payment = new PaymentsEntity();
+            payment.setOrder(savedOrder);
+            payment.setPaymentAmount(savedOrder.getTotalAmount());
+            payment.setPaymentMethod(method);
+            payment.setPaymentStatus(PaymentStatus.CONFIRMED); // ✅ 지금은 바로 결제완료 처리
+            payment.setPaymentDate(LocalDateTime.now());
+            payment.setTransactionId(UUID.randomUUID().toString()); // ✅ 임시 트랜잭션ID
+
+            paymentsRepository.save(payment);
+
+            // ✅ 주문 상태도 결제완료로 변경
+            savedOrder.setOrderStatus(OrderStatus.PAID);
+            // dirty checking으로 반영됨 (굳이 save 안 해도 됨)
+            // ordersRepository.save(savedOrder);
+
+            result.add(OrderResponse.fromEntity(savedOrder));
         }
 
-        // 5. 장바구니 비우기
+        // ✅ 장바구니 비우기
         cartItemsRepository.deleteAll(cartItems);
 
         return result;

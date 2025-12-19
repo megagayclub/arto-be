@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,10 +32,9 @@ public class OrdersController {
     }
 
     @PostMapping("/checkout")
-    public List<OrderResponse> checkoutFromCartMy(
-            @org.springframework.security.core.annotation.AuthenticationPrincipal
-            org.springframework.security.core.userdetails.UserDetails userDetails,
-            @Valid @RequestBody OrderCheckoutRequest request
+    public List<OrderResponse> checkoutFromCart(
+            @Valid @RequestBody OrderCheckoutRequest request,
+            @AuthenticationPrincipal org.springframework.security.core.userdetails.UserDetails userDetails
     ) {
         String email = userDetails.getUsername();
 
